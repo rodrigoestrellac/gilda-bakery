@@ -49,8 +49,7 @@
   }
   .brand__logo {
     width: 48px; height: 48px;
-    object-fit: cover; border-radius: 50%;
-    box-shadow: var(--md-sys-elevation-level1);
+    object-fit: contain;
   }
   .brand .bakery {
     display: inline-block; margin-left: 6px;
@@ -926,9 +925,9 @@ function renderPedidos(){
       <div class="prod-tbl-wrap" style="border:none; background:transparent">
         <table class="prod-tbl"><thead><tr>
           <th>Producto</th>
+          <th class="num">Falta hacer</th>
           <th class="num">Stock</th>
           <th class="num">A producir</th>
-          <th class="num">Falta hacer</th>
         </tr></thead><tbody>` +
         resumen.map(s=>{
           const stockLbl = s.stock>0 ? `${s.stock} u` : '—';
@@ -936,9 +935,9 @@ function renderPedidos(){
           const faltaCls = s.faltaHacer===0 ? 'status success' : 'status neutral';
           const faltaLbl = s.aProducir===0 ? '—' : `<span class="md-chip ${faltaCls}">${s.faltaHacer} u</span>`;
           return `<tr><td><div class="prod-tbl__name">${esc(s.nombre)}</div></td>
+            <td class="num">${faltaLbl}</td>
             <td class="num">${stockLbl}</td>
-            <td class="num">${prodLbl}</td>
-            <td class="num">${faltaLbl}</td></tr>`;
+            <td class="num">${prodLbl}</td></tr>`;
         }).join('') +
       `</tbody></table></div></div>`;
   }
