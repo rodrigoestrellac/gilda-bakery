@@ -171,6 +171,14 @@
     color: var(--md-sys-color-on-surface);
   }
 
+  /* ── Sección con título corto ──────────────────────────────────────────── */
+  .section-title {
+    margin: 16px 0 8px;
+    font-size: 13px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.6px;
+    color: var(--md-sys-color-on-surface-variant);
+  }
+
   /* ── Pedido item row (producto + cant + precio + quitar) ───────────────── */
   .pedido-item-row {
     display: grid;
@@ -993,7 +1001,8 @@ function renderPedidos(){
         <td class="num">${waBtn}</td>
       </tr>`;
     }).join('');
-    html += `<div class="prod-tbl-wrap">
+    html += `<h3 class="section-title">Pedidos cargados</h3>
+    <div class="prod-tbl-wrap">
       <table class="prod-tbl">
         <thead><tr>
           <th>Cliente</th>
