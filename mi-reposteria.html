@@ -1,0 +1,1734 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gilda Bakery — ¿Cuánto gano?</title>
+<link rel="stylesheet" href="design/tokens.css">
+<link rel="stylesheet" href="design/components.css">
+<style>
+  /* ── Layout app ────────────────────────────────────────────────────────── */
+  html, body { margin: 0; min-height: 100vh; }
+  body { background: var(--md-sys-color-background); color: var(--md-sys-color-on-surface); }
+
+  .app { min-height: 100vh; display: flex; flex-direction: column; }
+  .main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  .content {
+    flex: 1; padding: 12px 16px 112px; max-width: 640px; width: 100%;
+    margin: 0 auto;
+  }
+
+  /* Navegación: bar abajo en mobile, rail a la izquierda en desktop */
+  .md-nav-rail { display: none; }
+  .md-nav-bar {
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 20;
+    padding-bottom: env(safe-area-inset-bottom);
+    box-shadow: var(--md-sys-elevation-level2);
+  }
+  .nav-item { cursor: pointer; }
+
+  @media (min-width: 1024px) {
+    .app { flex-direction: row; }
+    .md-nav-rail {
+      display: flex; position: sticky; top: 0; height: 100vh;
+      border-right: 1px solid var(--md-sys-color-outline-variant);
+      padding-top: 20px;
+    }
+    .md-nav-bar { display: none; }
+    .content { padding: 16px 40px 40px; max-width: 800px; }
+  }
+
+  /* ── Brand en el top app bar ───────────────────────────────────────────── */
+  .md-top-app-bar { justify-content: center; padding: 12px 16px 8px; }
+  .brand {
+    text-align: center; margin: 0; padding: 0;
+    font-family: var(--md-sys-typescale-display-font);
+    color: var(--md-sys-color-primary);
+    font-size: 30px; line-height: 1.1; font-weight: 400;
+  }
+  .brand .bakery {
+    display: inline-block; margin-left: 6px;
+    font-family: var(--md-sys-typescale-title-font);
+    font-weight: 700; font-size: 16px;
+    color: var(--md-sys-color-on-surface);
+    letter-spacing: 1.5px; text-transform: uppercase;
+    vertical-align: middle;
+  }
+  .tagline {
+    text-align: center; margin: 0 0 16px;
+    color: var(--md-sys-color-on-surface-variant);
+    font-size: 14px;
+  }
+  .rail-brand {
+    font-family: var(--md-sys-typescale-display-font);
+    color: var(--md-sys-color-primary);
+    font-size: 32px; line-height: 1; text-align: center;
+    margin-bottom: 8px;
+  }
+
+  /* ── Listas (recetas / insumos) ────────────────────────────────────────── */
+  .stack { display: flex; flex-direction: column; gap: 10px; }
+  .add-bar { margin-bottom: 12px; }
+  .add-bar .md-button { width: 100%; }
+  @media (min-width: 600px) {
+    .add-bar { display: flex; justify-content: flex-end; }
+    .add-bar .md-button { width: auto; }
+  }
+
+  .item-card {
+    display: flex; align-items: center; gap: 12px;
+    width: 100%; padding: 14px 16px;
+    background: var(--md-sys-color-surface-container-low);
+    border: 1px solid var(--md-sys-color-outline-variant);
+    border-radius: var(--md-sys-shape-corner-medium);
+    color: inherit; font: inherit; text-align: left;
+    cursor: pointer;
+    transition: background-color var(--md-sys-motion-duration-short3),
+                box-shadow var(--md-sys-motion-duration-short3);
+    -webkit-tap-highlight-color: transparent;
+  }
+  .item-card:hover { background: var(--md-sys-color-surface-container); box-shadow: var(--md-sys-elevation-level1); }
+  .item-card__info { flex: 1; min-width: 0; }
+  .item-card__name {
+    font-family: var(--md-sys-typescale-title-font);
+    font-size: 16px; font-weight: 700;
+    color: var(--md-sys-color-on-surface);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .item-card__sub {
+    font-size: 13px; color: var(--md-sys-color-on-surface-variant);
+    margin-top: 2px;
+  }
+
+  /* ── Tabla Productos (costo vs venta por unidad) ───────────────────────── */
+  .prod-tbl-wrap {
+    background: var(--md-sys-color-surface-container-low);
+    border: 1px solid var(--md-sys-color-outline-variant);
+    border-radius: var(--md-sys-shape-corner-medium);
+    overflow-x: auto;
+  }
+  .prod-tbl {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--md-sys-typescale-body-font);
+  }
+  .prod-tbl th, .prod-tbl td {
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--md-sys-color-outline-variant);
+  }
+  .prod-tbl th {
+    font-size: 12px; font-weight: 700;
+    color: var(--md-sys-color-on-surface-variant);
+    text-transform: uppercase; letter-spacing: 0.6px;
+    background: var(--md-sys-color-surface-container);
+  }
+  .prod-tbl tbody tr {
+    cursor: pointer;
+    transition: background-color var(--md-sys-motion-duration-short3);
+  }
+  .prod-tbl tbody tr:hover {
+    background: var(--md-sys-color-surface-container);
+  }
+  .prod-tbl tbody tr:last-child td { border-bottom: 0; }
+  .prod-tbl .num {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+    color: var(--md-sys-color-on-surface);
+    white-space: nowrap;
+  }
+  .prod-tbl__name {
+    font-family: var(--md-sys-typescale-title-font);
+    font-size: 15px; font-weight: 700;
+    color: var(--md-sys-color-on-surface);
+  }
+  .prod-tbl__unit {
+    font-size: 12px; color: var(--md-sys-color-on-surface-variant);
+    margin-top: 2px;
+  }
+
+  /* ── Switch row (label + toggle alineados) ─────────────────────────────── */
+  .switch-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px 16px; margin: 0 0 14px;
+    background: var(--md-sys-color-surface-container);
+    border-radius: var(--md-sys-shape-corner-small);
+  }
+  .switch-row__label {
+    font-family: var(--md-sys-typescale-body-font);
+    font-size: 15px; font-weight: 600;
+    color: var(--md-sys-color-on-surface);
+  }
+
+  /* ── Pedido item row (producto + cant + precio + quitar) ───────────────── */
+  .pedido-item-row {
+    display: grid;
+    grid-template-columns: 2fr 70px 1fr 36px;
+    gap: 8px; align-items: center;
+    margin-bottom: 8px;
+  }
+  .pedido-item-row__precio {
+    position: relative; display: flex; align-items: center;
+  }
+  .pedido-item-row__prefix {
+    position: absolute; left: 8px;
+    font-weight: 700; color: var(--md-sys-color-on-surface-variant);
+    pointer-events: none;
+  }
+  .pedido-item-row__precio .input-tight { padding-left: 22px; }
+
+  /* ── Stock card ─────────────────────────────────────────────────────────── */
+  .stock-card {
+    padding: 14px 16px;
+    background: var(--md-sys-color-surface-container-low);
+    border: 1px solid var(--md-sys-color-outline-variant);
+    border-radius: var(--md-sys-shape-corner-medium);
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .stock-card__top {
+    display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  }
+  .stock-card__info { flex: 1; min-width: 0; }
+  .stock-card__big {
+    font-family: var(--md-sys-typescale-display-font);
+    font-size: 32px; font-weight: 700;
+    color: var(--md-sys-color-primary);
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+  }
+  .stock-card__big small {
+    font-size: 14px; font-weight: 700;
+    color: var(--md-sys-color-on-surface-variant);
+    text-transform: uppercase; letter-spacing: 0.6px;
+  }
+  .stock-card__actions {
+    display: flex; align-items: center; gap: 6px;
+    flex-wrap: wrap;
+  }
+  .stock-card__input {
+    width: 80px; text-align: center;
+    font-weight: 700; font-size: 16px;
+  }
+
+  /* ── Pedido card ────────────────────────────────────────────────────────── */
+  .pedido-card {
+    display: flex; flex-direction: column; align-items: stretch; gap: 8px;
+    padding: 14px 16px;
+  }
+  .pedido-card__head {
+    display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;
+  }
+  .pedido-card__cliente {
+    font-family: var(--md-sys-typescale-title-font);
+    font-size: 16px; font-weight: 700;
+    color: var(--md-sys-color-on-surface);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    flex: 1; min-width: 0;
+  }
+  .pedido-card__meta {
+    display: flex; gap: 6px; flex-shrink: 0; flex-wrap: wrap; justify-content: flex-end;
+  }
+  .pedido-card__fecha {
+    font-size: 13px; color: var(--md-sys-color-on-surface-variant);
+    font-weight: 600;
+    display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap;
+  }
+  .pedido-card__wa {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 12px;
+    background: #25D366; color: white;
+    border-radius: 999px;
+    text-decoration: none;
+    font-size: 12px; font-weight: 700;
+    transition: filter var(--md-sys-motion-duration-short3);
+  }
+  .pedido-card__wa:hover { filter: brightness(0.92); }
+  .pedido-card__wa svg { display: block; }
+  .pedido-card__items {
+    margin: 0; padding-left: 20px;
+    font-size: 13px; color: var(--md-sys-color-on-surface);
+  }
+  .pedido-card__items li { margin: 2px 0; }
+  .pedido-card__notas {
+    font-size: 12px; color: var(--md-sys-color-on-surface-variant);
+    font-style: italic;
+    padding: 6px 10px;
+    background: var(--md-sys-color-surface);
+    border-radius: var(--md-sys-shape-corner-small);
+  }
+
+  /* ── Empty state ───────────────────────────────────────────────────────── */
+  .empty {
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    padding: 48px 24px; text-align: center;
+    color: var(--md-sys-color-on-surface-variant);
+  }
+  .empty .material-symbols-rounded { font-size: 64px; opacity: 0.5; margin-bottom: 4px; }
+  .empty .empty-title {
+    font-family: var(--md-sys-typescale-title-font);
+    font-weight: 700; font-size: 17px;
+    color: var(--md-sys-color-on-surface);
+  }
+  .empty small { font-size: 13px; }
+
+  /* ── Sección dentro de card ────────────────────────────────────────────── */
+  .md-card.section { padding: 18px 18px; margin-bottom: 12px; }
+  .section-title {
+    font-family: var(--md-sys-typescale-title-font);
+    font-size: var(--md-sys-typescale-title-large-size);
+    line-height: var(--md-sys-typescale-title-large-line-height);
+    font-weight: 700;
+    color: var(--md-sys-color-primary);
+    margin: 0 0 14px;
+  }
+
+  /* ── Form fields ───────────────────────────────────────────────────────── */
+  .field { margin-bottom: 14px; }
+  /* Cuando hay prefijo "$", el label en estado bajo arranca después del prefijo */
+  .md-text-field.with-prefix .md-text-field__label { left: 32px; }
+  .md-text-field.with-prefix .md-text-field__input:focus + .md-text-field__label,
+  .md-text-field.with-prefix .md-text-field__input:not(:placeholder-shown) + .md-text-field__label { left: 16px; }
+  /* Prefijo "$": baseline alineado con el VALOR del input (top: 24px). */
+  .md-text-field.with-prefix .md-text-field__prefix {
+    top: 24px; bottom: auto; transform: none;
+    line-height: var(--md-sys-typescale-body-large-line-height);
+    font-size: var(--md-sys-typescale-body-large-size);
+    transition: top var(--md-sys-motion-duration-short3) var(--md-sys-motion-easing-standard);
+  }
+  /* Cuando el input está vacío (placeholder visible), el $ sube para acompañar al label/placeholder */
+  .md-text-field.with-prefix:has(.md-text-field__input:placeholder-shown:not(:focus)) .md-text-field__prefix {
+    top: 18px;
+  }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .label-line {
+    display: block; font-family: var(--md-sys-typescale-label-font);
+    font-weight: 700; font-size: 13px;
+    color: var(--md-sys-color-on-surface-variant);
+    margin-bottom: 6px;
+  }
+  .hint {
+    font-size: 12px; color: var(--md-sys-color-on-surface-variant);
+    margin: 6px 0 0;
+  }
+
+  /* Inputs compactos para filas tabulares (ingredientes) */
+  .input-tight, .select-tight {
+    width: 100%; height: 44px;
+    padding: 0 12px;
+    font-family: var(--md-sys-typescale-body-font); font-size: 14px;
+    color: var(--md-sys-color-on-surface);
+    background: var(--md-sys-color-surface-container-highest);
+    border: none; border-bottom: 1px solid var(--md-sys-color-on-surface-variant);
+    border-radius: var(--md-sys-shape-corner-extra-small) var(--md-sys-shape-corner-extra-small) 0 0;
+    outline: none;
+    appearance: none; -webkit-appearance: none;
+    transition: border-color var(--md-sys-motion-duration-short3);
+  }
+  .input-tight:focus, .select-tight:focus { border-bottom: 2px solid var(--md-sys-color-primary); padding-bottom: 0; }
+  .select-tight { padding-right: 28px; background-image: linear-gradient(45deg, transparent 50%, var(--md-sys-color-on-surface-variant) 50%), linear-gradient(135deg, var(--md-sys-color-on-surface-variant) 50%, transparent 50%); background-position: calc(100% - 14px) 50%, calc(100% - 9px) 50%; background-size: 5px 5px, 5px 5px; background-repeat: no-repeat; }
+
+  /* ── Hero (ganancia por hora) ──────────────────────────────────────────── */
+  .hero {
+    padding: 22px 16px; margin: 14px 0;
+    border-radius: var(--md-sys-shape-corner-large);
+    text-align: center;
+  }
+  .hero.success { background: var(--md-sys-color-success-container); color: var(--md-sys-color-on-success-container); }
+  .hero.error   { background: var(--md-sys-color-error-container);   color: var(--md-sys-color-on-error-container); }
+  .hero.neutral { background: var(--md-sys-color-warning-container); color: var(--md-sys-color-on-warning-container); }
+  .hero__label {
+    font-family: var(--md-sys-typescale-label-font);
+    font-weight: 700; font-size: 11px;
+    text-transform: uppercase; letter-spacing: 1.2px; opacity: 0.85;
+  }
+  .hero__big {
+    font-family: var(--md-sys-typescale-display-font);
+    font-size: 44px; line-height: 1.1; margin: 6px 0;
+    font-variant-numeric: tabular-nums;
+  }
+  .hero__msg { font-size: 13px; font-weight: 600; }
+
+  /* ── Desglose de líneas ────────────────────────────────────────────────── */
+  .lines {
+    padding: 12px 16px;
+    background: var(--md-sys-color-surface);
+    border: 1px solid var(--md-sys-color-outline-variant);
+    border-radius: var(--md-sys-shape-corner-medium);
+    margin: 8px 0 14px;
+  }
+  .lines .line {
+    display: flex; justify-content: space-between; align-items: baseline;
+    padding: 8px 0;
+    border-bottom: 1px dashed var(--md-sys-color-outline-variant);
+    font-size: 14px; font-weight: 600;
+    color: var(--md-sys-color-on-surface);
+  }
+  .lines .line:last-child { border-bottom: 0; }
+  .lines .line .v { font-variant-numeric: tabular-nums; font-weight: 700; }
+  .lines .line.total {
+    font-family: var(--md-sys-typescale-title-font);
+    font-weight: 700; font-size: 17px;
+    color: var(--md-sys-color-primary);
+    border-top: 2px solid var(--md-sys-color-outline-variant);
+    margin-top: 4px; padding-top: 12px;
+  }
+
+  /* ── Nota destacada (warning soft) ─────────────────────────────────────── */
+  .note {
+    padding: 14px 16px;
+    background: var(--md-sys-color-warning-container);
+    color: var(--md-sys-color-on-warning-container);
+    border-radius: var(--md-sys-shape-corner-medium);
+    font-size: 13px; line-height: 1.55;
+    margin-bottom: 14px;
+  }
+  .note b { font-weight: 700; }
+
+  /* ── "Pegar receta" details ────────────────────────────────────────────── */
+  .paste {
+    background: var(--md-sys-color-surface-container);
+    border: 1.5px dashed var(--md-sys-color-primary);
+    border-radius: var(--md-sys-shape-corner-medium);
+    padding: 0 16px;
+    margin-bottom: 14px;
+  }
+  .paste > summary {
+    cursor: pointer; list-style: none;
+    font-family: var(--md-sys-typescale-label-font);
+    font-weight: 700; font-size: 14px;
+    color: var(--md-sys-color-primary);
+    padding: 14px 0;
+  }
+  .paste > summary::-webkit-details-marker { display: none; }
+  .paste > summary::before { content: '+ '; font-weight: 900; margin-right: 2px; }
+  .paste[open] > summary::before { content: '− '; }
+  .paste textarea {
+    font-family: var(--md-sys-typescale-body-font); font-size: 15px;
+    line-height: 1.55;
+    width: 100%; min-height: 130px;
+    color: var(--md-sys-color-on-surface);
+    background: var(--md-sys-color-surface-container-lowest);
+    border: 1px solid var(--md-sys-color-outline-variant);
+    border-radius: var(--md-sys-shape-corner-small);
+    padding: 12px;
+    margin-bottom: 10px; resize: vertical;
+  }
+  .paste__hint { font-size: 12px; color: var(--md-sys-color-on-surface-variant); margin: 0 0 8px; }
+
+  /* ── Simulador inverso ─────────────────────────────────────────────────── */
+  .sim {
+    margin-top: 16px; padding: 16px;
+    background: var(--md-sys-color-surface-container-low);
+    border: 1.5px dashed var(--md-sys-color-primary);
+    border-radius: var(--md-sys-shape-corner-medium);
+  }
+  .sim__label {
+    display: block;
+    font-family: var(--md-sys-typescale-label-font);
+    font-weight: 700; font-size: 14px;
+    color: var(--md-sys-color-primary);
+    margin-bottom: 10px;
+  }
+  .sim__result {
+    margin-top: 12px; text-align: center;
+    font-family: var(--md-sys-typescale-body-font);
+    font-weight: 700;
+    font-size: 20px; color: var(--md-sys-color-primary);
+    font-variant-numeric: tabular-nums;
+  }
+  .sim__result b { font-weight: 400; }
+
+  .gas-out {
+    text-align: center; margin-top: 10px;
+    font-family: var(--md-sys-typescale-title-font);
+    font-size: 18px; font-weight: 700;
+    color: var(--md-sys-color-primary);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ── Ingredientes en la receta ─────────────────────────────────────────── */
+  .ing-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1.8fr) minmax(0, 0.9fr) minmax(0, 1fr) auto;
+    gap: 6px; align-items: end;
+    margin-bottom: 4px;
+  }
+  .ing-row .md-icon-button {
+    width: 44px; height: 44px;
+    color: var(--md-sys-color-error);
+  }
+  .ing-cost {
+    font-family: var(--md-sys-typescale-label-font);
+    font-weight: 700; font-size: 12px;
+    color: var(--md-sys-color-on-surface-variant);
+    text-align: right; margin: 2px 6px 10px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ── Action bar (bottom buttons) ───────────────────────────────────────── */
+  .action-bar { display: flex; gap: 10px; margin-top: 18px; }
+  .action-bar .md-button { flex: 1; }
+
+  /* ── Modal (overlay + dialog ajustado) ─────────────────────────────────── */
+  .overlay {
+    position: fixed; inset: 0; z-index: 100;
+    background: var(--md-sys-color-scrim);
+    backdrop-filter: blur(2px);
+    display: none; align-items: flex-end; justify-content: center;
+  }
+  .overlay.open { display: flex; }
+
+  .md-dialog.modal {
+    width: 100%; max-width: 600px; max-height: 92vh;
+    overflow-y: auto;
+    border-radius: var(--md-sys-shape-corner-extra-large) var(--md-sys-shape-corner-extra-large) 0 0;
+    padding: 20px 20px calc(20px + env(safe-area-inset-bottom));
+    background: var(--md-sys-color-surface-container-high);
+  }
+  @media (min-width: 600px) {
+    .overlay { align-items: center; padding: 24px; }
+    .md-dialog.modal { border-radius: var(--md-sys-shape-corner-extra-large); }
+  }
+
+  .modal-head {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 18px;
+  }
+  .modal-head h2 {
+    margin: 0;
+    font-family: var(--md-sys-typescale-headline-font);
+    font-size: var(--md-sys-typescale-headline-small-size);
+    line-height: var(--md-sys-typescale-headline-small-line-height);
+    font-weight: var(--md-sys-typescale-headline-small-weight);
+    color: var(--md-sys-color-on-surface);
+  }
+
+  /* ── Snackbar (toast) ─────────────────────────────────────────────────── */
+  .snackbar-wrap {
+    position: fixed; bottom: 96px; left: 0; right: 0;
+    display: flex; justify-content: center;
+    padding: 0 16px; z-index: 200; pointer-events: none;
+  }
+  @media (min-width: 1024px) {
+    .snackbar-wrap { bottom: 24px; }
+  }
+  .md-snackbar.toast {
+    opacity: 0; transform: translateY(20px);
+    transition: opacity var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard),
+                transform var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
+  }
+  .md-snackbar.toast.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
+
+  /* ── Login screen ──────────────────────────────────────────────────────── */
+  .login-screen {
+    min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    padding: 24px;
+  }
+  .login-screen[hidden] { display: none; }
+  .login-card {
+    background: var(--md-sys-color-surface-container-low);
+    border: 1px solid var(--md-sys-color-outline-variant);
+    border-radius: var(--md-sys-shape-corner-extra-large);
+    padding: 32px 28px;
+    max-width: 380px; width: 100%;
+    box-shadow: var(--md-sys-elevation-level1);
+  }
+  .login-card .brand {
+    text-align: center; margin: 0 0 8px;
+    font-family: var(--md-sys-typescale-display-font);
+    color: var(--md-sys-color-primary);
+    font-size: 36px; line-height: 1.1; font-weight: 400;
+  }
+  .login-card .brand .bakery {
+    display: inline-block; margin-left: 6px;
+    font-family: var(--md-sys-typescale-title-font);
+    font-weight: 700; font-size: 16px;
+    color: var(--md-sys-color-on-surface);
+    letter-spacing: 1.5px; text-transform: uppercase;
+    vertical-align: middle;
+  }
+  .login-card .lead {
+    text-align: center; margin: 0 0 24px;
+    color: var(--md-sys-color-on-surface-variant);
+    font-size: 14px;
+  }
+  .login-error {
+    margin-top: 12px; text-align: center;
+    color: var(--md-sys-color-error);
+    font-size: 13px; font-weight: 700;
+    min-height: 20px;
+  }
+  .app[hidden] { display: none; }
+</style>
+</head>
+<body>
+
+<!-- Pantalla de login (visible mientras no haya sesión) -->
+<div id="login-screen" class="login-screen" hidden>
+  <form class="login-card" onsubmit="iniciarSesion(event)">
+    <h1 class="brand">Gilda<span class="bakery">Bakery</span></h1>
+    <p class="lead">Ingresá con la cuenta compartida</p>
+
+    <div class="field">
+      <div class="md-text-field">
+        <input class="md-text-field__input" id="login-email" type="email" placeholder=" " required autocomplete="email">
+        <label class="md-text-field__label" for="login-email">Email</label>
+      </div>
+    </div>
+    <div class="field">
+      <div class="md-text-field">
+        <input class="md-text-field__input" id="login-pass" type="password" placeholder=" " required autocomplete="current-password">
+        <label class="md-text-field__label" for="login-pass">Contraseña</label>
+      </div>
+    </div>
+
+    <button class="md-button filled" type="submit" id="login-btn" style="width:100%; margin-top:8px">
+      <span class="material-symbols-rounded">login</span> Entrar
+    </button>
+    <div class="login-error" id="login-error"></div>
+  </form>
+</div>
+
+<div class="app" id="app" hidden>
+  <!-- Navigation rail (desktop ≥1024px) -->
+  <nav class="md-nav-rail" aria-label="Navegación principal">
+    <div class="rail-brand">G</div>
+    <button class="md-nav-rail__item nav-item active" data-vista="recetas" type="button">
+      <span class="md-nav-bar__indicator"><span class="material-symbols-rounded">restaurant_menu</span></span>
+      Recetas
+    </button>
+    <button class="md-nav-rail__item nav-item" data-vista="productos" type="button">
+      <span class="md-nav-bar__indicator"><span class="material-symbols-rounded">sell</span></span>
+      Productos
+    </button>
+    <button class="md-nav-rail__item nav-item" data-vista="pedidos" type="button">
+      <span class="md-nav-bar__indicator"><span class="material-symbols-rounded">receipt_long</span></span>
+      Pedidos
+    </button>
+    <button class="md-nav-rail__item nav-item" data-vista="stock" type="button">
+      <span class="md-nav-bar__indicator"><span class="material-symbols-rounded">warehouse</span></span>
+      Stock
+    </button>
+    <button class="md-nav-rail__item nav-item" data-vista="insumos" type="button">
+      <span class="md-nav-bar__indicator"><span class="material-symbols-rounded">inventory_2</span></span>
+      Insumos
+    </button>
+    <button class="md-nav-rail__item nav-item" data-vista="ajustes" type="button">
+      <span class="md-nav-bar__indicator"><span class="material-symbols-rounded">settings</span></span>
+      Ajustes
+    </button>
+  </nav>
+
+  <!-- Main column -->
+  <div class="main">
+    <header class="md-top-app-bar center">
+      <h1 class="brand">Gilda<span class="bakery">Bakery</span></h1>
+    </header>
+    <p class="tagline">Cargá lo que gastás y mirá cuánto ganás por hora 🧁</p>
+    <main id="vista" class="content"></main>
+  </div>
+
+  <!-- Navigation bar (mobile <1024px) -->
+  <nav class="md-nav-bar" aria-label="Navegación principal móvil">
+    <button class="md-nav-bar__item nav-item active" data-vista="recetas" type="button">
+      <span class="md-nav-bar__indicator"><span class="material-symbols-rounded">restaurant_menu</span></span>
+      Recetas
+    </button>
+    <button class="md-nav-bar__item nav-item" data-vista="productos" type="button">
+      <span class="md-nav-bar__indicator"><span class="material-symbols-rounded">sell</span></span>
+      Productos
+    </button>
+    <button class="md-nav-bar__item nav-item" data-vista="pedidos" type="button">
+      <span class="md-nav-bar__indicator"><span class="material-symbols-rounded">receipt_long</span></span>
+      Pedidos
+    </button>
+    <button class="md-nav-bar__item nav-item" data-vista="stock" type="button">
+      <span class="md-nav-bar__indicator"><span class="material-symbols-rounded">warehouse</span></span>
+      Stock
+    </button>
+    <button class="md-nav-bar__item nav-item" data-vista="insumos" type="button">
+      <span class="md-nav-bar__indicator"><span class="material-symbols-rounded">inventory_2</span></span>
+      Insumos
+    </button>
+    <button class="md-nav-bar__item nav-item" data-vista="ajustes" type="button">
+      <span class="md-nav-bar__indicator"><span class="material-symbols-rounded">settings</span></span>
+      Ajustes
+    </button>
+  </nav>
+</div>
+
+<div class="overlay" id="overlay"><div class="md-dialog modal" id="modal"></div></div>
+<div class="snackbar-wrap"><div class="md-snackbar toast" id="toast"></div></div>
+
+<script type="module">
+"use strict";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+/* ---------- Cliente Supabase ---------- */
+const SUPABASE_URL = "https://xmhyjlgihdgjcrdajbys.supabase.co";
+const SUPABASE_KEY = "sb_publishable_Z9qimqwsXa_8nSdU_UQLIQ_1tZsllGU";
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+/* ---------- Unidades y helpers ---------- */
+const UNITS = {
+  kg:{fam:'peso',f:1000,lbl:'kg'}, g:{fam:'peso',f:1,lbl:'g'},
+  l:{fam:'volumen',f:1000,lbl:'l'}, ml:{fam:'volumen',f:1,lbl:'ml'},
+  u:{fam:'unidad',f:1,lbl:'unidad'}
+};
+const FAM_UNITS = { peso:['kg','g'], volumen:['l','ml'], unidad:['u'] };
+const UNIDADES_VENTA = ['unidad','docena','media docena','porción','kilo'];
+function pluralUnidad(u, n){
+  if(n===1) return u;
+  if(u==='media docena') return 'medias docenas';
+  if(u.endsWith('ión')) return u.slice(0,-3)+'iones';
+  if(/[aeiouáéíóú]$/i.test(u)) return u+'s';
+  return u+'es';
+}
+
+const moneda = new Intl.NumberFormat('es-AR',{style:'currency',currency:'ARS',maximumFractionDigits:0});
+const monedaDec = new Intl.NumberFormat('es-AR',{style:'currency',currency:'ARS',maximumFractionDigits:2});
+function $(v){ if(!isFinite(v)) return '—'; return Math.abs(v)<100 && v!==0 ? monedaDec.format(v) : moneda.format(v); }
+function num(v){ const n=parseFloat(String(v).replace(',','.')); return isFinite(n)?n:0; }
+const uid = ()=> Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+
+/* ---------- Estado + almacenamiento (Supabase: tabla kv) ---------- */
+let insumos=[], recetas=[], pedidos=[], config={gasMonto:0, gasTandas:1, pagoRef:0};
+
+async function cargar(k, def){
+  const { data, error } = await supabase.from('kv').select('valor').eq('clave', k).maybeSingle();
+  if(error){ console.error('cargar('+k+'):', error); toast('Error al cargar '+k); return def; }
+  return data ? data.valor : def;
+}
+async function guardar(k, val){
+  const { error } = await supabase.from('kv').upsert({ clave: k, valor: val, actualizado: new Date().toISOString() });
+  if(error){ console.error('guardar('+k+'):', error); toast('Error al guardar '+k); }
+}
+async function guardarTodo(){
+  await guardar('insumos',insumos);
+  await guardar('recetas',recetas);
+  await guardar('config',config);
+  await guardar('pedidos',pedidos);
+}
+
+/* ---------- Cálculos ---------- */
+function costoPorBase(ins){
+  const total = num(ins.cantidad)*UNITS[ins.unidad].f;
+  return total>0 ? num(ins.costoCompra)/total : 0;
+}
+function costoIngrediente(ing){
+  const ins = insumos.find(i=>i.id===ing.insumoId);
+  if(!ins) return 0;
+  return num(ing.cantidad)*UNITS[ing.unidad].f * costoPorBase(ins);
+}
+function gasPorTanda(){ return num(config.gasTandas)>0 ? num(config.gasMonto)/num(config.gasTandas) : 0; }
+
+function calcular(r){
+  const cInsumos = (r.ingredientes||[]).reduce((s,ing)=>s+costoIngrediente(ing),0);
+  const cGas = gasPorTanda()*(num(r.tandas)||0);
+  const cTotal = cInsumos + cGas;
+  const rinde = num(r.rinde);
+  const cUnidad = rinde>0 ? cTotal/rinde : 0;
+  const ingreso = num(r.precio)*rinde;
+  const ganancia = ingreso - cTotal;
+  const horas = num(r.horas);
+  const porHora = horas>0 ? ganancia/horas : null;
+  return {cInsumos,cGas,cTotal,cUnidad,ingreso,ganancia,horas,porHora,rinde};
+}
+
+/* ---------- Render principal ---------- */
+let vistaActual='recetas';
+const vista=document.getElementById('vista');
+
+function setTab(v){
+  vistaActual=v;
+  document.querySelectorAll('.nav-item').forEach(t=>t.classList.toggle('active', t.dataset.vista===v));
+  render();
+}
+document.querySelectorAll('.nav-item').forEach(t=>t.addEventListener('click',()=>setTab(t.dataset.vista)));
+
+function render(){
+  if(vistaActual==='recetas') renderRecetas();
+  else if(vistaActual==='productos') renderProductos();
+  else if(vistaActual==='pedidos') renderPedidos();
+  else if(vistaActual==='stock') renderStock();
+  else if(vistaActual==='insumos') renderInsumos();
+  else renderAjustes();
+}
+
+/* ----- Vista Recetas ----- */
+function tonoHora(ph){
+  if(ph===null) return 'neutral';
+  if(ph<0) return 'error';
+  if(num(config.pagoRef)>0) return ph>=num(config.pagoRef)?'success':'neutral';
+  return 'success';
+}
+function chipTono(tono){
+  return tono==='success'?'status success':tono==='error'?'status error':'status neutral';
+}
+function renderRecetas(){
+  let html = `<div class="add-bar"><button class="md-button filled" type="button" onclick="abrirReceta()">
+    <span class="material-symbols-rounded">add</span> Nueva receta
+  </button></div>`;
+  if(recetas.length===0){
+    html += `<div class="md-card outlined section">
+      <div class="empty">
+        <span class="material-symbols-rounded">restaurant_menu</span>
+        <p class="empty-title">Todavía no cargaste recetas</p>
+        <small>Tip: primero cargá tus insumos en la pestaña de Insumos, después armás la receta.</small>
+      </div>
+    </div>`;
+  } else {
+    html += `<div class="stack">` + recetas.map(r=>{
+      const c=calcular(r);
+      const tono=tonoHora(c.porHora);
+      const txt = c.porHora===null ? 'Cargá las horas' : $(c.porHora)+'/h';
+      const uv = r.unidadVenta||'unidad';
+      const rindeLbl = `${c.rinde||0} ${pluralUnidad(uv, c.rinde||0)}`;
+      return `<button class="item-card" type="button" onclick="abrirReceta('${r.id}')">
+        <div class="item-card__info">
+          <div class="item-card__name">${esc(r.nombre)||'Sin nombre'}</div>
+          <div class="item-card__sub">Rinde ${rindeLbl} · ${$(r.precio)}/${uv} · ${$(c.cUnidad)} costo</div>
+        </div>
+        <span class="md-chip ${chipTono(tono)}">${txt}</span>
+      </button>`;
+    }).join('') + `</div>`;
+  }
+  vista.innerHTML=html;
+}
+
+/* ----- Vista Productos (tabla: todo normalizado a costo/venta por unidad individual) ----- */
+function unidadesPorVenta(uv){
+  if(uv==='docena') return 12;
+  if(uv==='media docena') return 6;
+  return 1; // unidad, porción, kilo
+}
+function renderProductos(){
+  let html = '';
+  if(recetas.length===0){
+    html = `<div class="md-card outlined section">
+      <div class="empty">
+        <span class="material-symbols-rounded">sell</span>
+        <p class="empty-title">Sin productos para mostrar</p>
+        <small>Cargá una receta en la pestaña de Recetas para ver acá su costo y precio de venta.</small>
+      </div>
+    </div>`;
+  } else {
+    const filas = recetas.map(r=>{
+      const c=calcular(r);
+      const uv = r.unidadVenta||'unidad';
+      const por = unidadesPorVenta(uv);
+      const precio = num(r.precio);
+      const costoU = c.cUnidad / por;
+      const ventaU = precio / por;
+      const ganancia = ventaU - costoU;
+      const margen = ventaU>0 ? Math.round(ganancia/ventaU*100) : null;
+      const tono = ganancia<=0 ? 'error' : (margen!==null && margen<30 ? 'neutral' : 'success');
+      const gananciaTxt = precio===0 ? '—' : (ganancia>=0?'+':'')+$(ganancia);
+      const margenTxt = margen===null ? '—' : `${margen}%`;
+      const unitDesc = por===1 ? `Por ${uv}` : `Por ${uv} · ×${por}`;
+      return `<tr onclick="abrirReceta('${r.id}')">
+        <td>
+          <div class="prod-tbl__name">${esc(r.nombre)||'Sin nombre'}</div>
+          <div class="prod-tbl__unit">${unitDesc}</div>
+        </td>
+        <td class="num">${$(costoU)}</td>
+        <td class="num">${precio===0?'—':$(ventaU)}</td>
+        <td class="num"><span class="md-chip ${chipTono(tono)}">${gananciaTxt} · ${margenTxt}</span></td>
+      </tr>`;
+    }).join('');
+    html = `<div class="prod-tbl-wrap">
+      <table class="prod-tbl">
+        <thead>
+          <tr>
+            <th>Producto</th>
+            <th class="num">Costo c/u</th>
+            <th class="num">Venta c/u</th>
+            <th class="num">Ganancia</th>
+          </tr>
+        </thead>
+        <tbody>${filas}</tbody>
+      </table>
+    </div>`;
+  }
+  vista.innerHTML=html;
+}
+
+/* ----- Vista Pedidos ----- */
+const ESTADOS = [
+  {v:'pendiente', lbl:'Pendiente', tono:'neutral'},
+  {v:'listo',     lbl:'Listo',     tono:'success'},
+  {v:'entregado', lbl:'Entregado', tono:'success'}
+];
+function estadoMeta(v){ return ESTADOS.find(e=>e.v===v) || ESTADOS[0]; }
+function fmtFecha(iso){
+  if(!iso) return 'Sin fecha';
+  const [y,m,d] = iso.split('-');
+  return `${d}/${m}`;
+}
+function waLink(celular){
+  if(!celular) return null;
+  const raw = String(celular).trim();
+  let s = raw.replace(/\D/g,'');
+  if(!s) return null;
+  if(raw.startsWith('+')) return `https://wa.me/${s}`;
+  if(s.startsWith('0')) s = s.slice(1);
+  if(!s.startsWith('54')){
+    if(!s.startsWith('9')) s = '9' + s;
+    s = '54' + s;
+  }
+  return `https://wa.me/${s}`;
+}
+function resumenProduccion(){
+  // Por receta: stock atómico disponible, a producir (pendientes) y a entregar (listos), todo en UNIDADES ATÓMICAS
+  const m = new Map();
+  recetas.forEach(r=>{
+    m.set(r.id, {
+      recetaId: r.id, nombre: r.nombre,
+      uv: r.unidadVenta||'unidad',
+      por: unidadesPorVenta(r.unidadVenta||'unidad'),
+      stock: r.stock||0,
+      aProducir: 0, porEntregar: 0
+    });
+  });
+  pedidos.forEach(p=>{
+    if(p.estado==='entregado') return;
+    (p.items||[]).forEach(it=>{
+      const slot = m.get(it.recetaId); if(!slot) return;
+      const cant = num(it.cantidad) * slot.por; // a unidades atómicas
+      if(p.estado==='listo') slot.porEntregar += cant;
+      else slot.aProducir += cant;
+    });
+  });
+  return Array.from(m.values())
+    .map(s=>({...s, faltaHacer: Math.max(0, s.aProducir - s.stock)}))
+    .filter(s=>s.aProducir>0 || s.porEntregar>0 || s.stock>0);
+}
+function renderPedidos(){
+  let html = `<div class="add-bar"><button class="md-button filled" type="button" onclick="abrirPedido()">
+    <span class="material-symbols-rounded">add</span> Nuevo pedido
+  </button></div>`;
+  const resumen = resumenProduccion();
+  if(resumen.length){
+    html += `<div class="md-card outlined section" style="padding:14px 16px">
+      <h3 style="margin:0 0 4px 0; font-size:13px; text-transform:uppercase; letter-spacing:0.6px; color:var(--md-sys-color-on-surface-variant)">Resumen de producción</h3>
+      <p class="hint" style="margin:0 0 10px">Todo en unidades. "Falta hacer" = pedidos pendientes − stock disponible.</p>
+      <div class="prod-tbl-wrap" style="border:none; background:transparent">
+        <table class="prod-tbl"><thead><tr>
+          <th>Producto</th>
+          <th class="num">Stock</th>
+          <th class="num">A producir</th>
+          <th class="num">Falta hacer</th>
+        </tr></thead><tbody>` +
+        resumen.map(s=>{
+          const stockLbl = s.stock>0 ? `${s.stock} u` : '—';
+          const prodLbl = s.aProducir>0 ? `${s.aProducir} u` : '—';
+          const faltaCls = s.faltaHacer===0 ? 'status success' : 'status neutral';
+          const faltaLbl = s.aProducir===0 ? '—' : `<span class="md-chip ${faltaCls}">${s.faltaHacer} u</span>`;
+          return `<tr><td><div class="prod-tbl__name">${esc(s.nombre)}</div></td>
+            <td class="num">${stockLbl}</td>
+            <td class="num">${prodLbl}</td>
+            <td class="num">${faltaLbl}</td></tr>`;
+        }).join('') +
+      `</tbody></table></div></div>`;
+  }
+  if(pedidos.length===0){
+    html += `<div class="md-card outlined section">
+      <div class="empty">
+        <span class="material-symbols-rounded">receipt_long</span>
+        <p class="empty-title">No hay pedidos cargados</p>
+        <small>Tocá "Nuevo pedido" para anotar lo que te encargaron, con cliente, fecha de entrega y productos.</small>
+      </div>
+    </div>`;
+  } else {
+    const ordenados = [...pedidos].sort((a,b)=>{
+      const ord = {pendiente:0, listo:1, entregado:2};
+      if(ord[a.estado]!==ord[b.estado]) return ord[a.estado]-ord[b.estado];
+      return (a.fechaEntrega||'').localeCompare(b.fechaEntrega||'');
+    });
+    html += `<div class="stack">` + ordenados.map(p=>{
+      const em = estadoMeta(p.estado);
+      const items = (p.items||[]).map(it=>{
+        const r = recetas.find(x=>x.id===it.recetaId);
+        const nombre = r ? r.nombre : '(producto borrado)';
+        const uv = r ? (r.unidadVenta||'unidad') : 'unidad';
+        const cant = num(it.cantidad);
+        return `<li>${cant} ${pluralUnidad(uv,cant)} · ${esc(nombre)}</li>`;
+      }).join('');
+      const wa = waLink(p.celular);
+      const waBtn = wa ? `<a class="pedido-card__wa" href="${wa}" target="_blank" rel="noopener" onclick="event.stopPropagation()" aria-label="Abrir WhatsApp">
+        <svg viewBox="0 0 32 32" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M16 .4C7.4.4.4 7.4.4 16c0 2.8.7 5.4 2 7.7L.3 31.6l8.1-2.1c2.2 1.2 4.8 1.9 7.5 1.9 8.6 0 15.6-7 15.6-15.6S24.6.4 16 .4zm0 28.4c-2.5 0-4.8-.7-6.8-1.9l-.5-.3-4.8 1.3 1.3-4.7-.3-.5C3.6 20.7 2.9 18.4 2.9 16 2.9 8.8 8.8 2.9 16 2.9S29.1 8.8 29.1 16 23.2 28.8 16 28.8zm7.2-9.8c-.4-.2-2.3-1.1-2.7-1.3-.4-.1-.6-.2-.9.2-.3.4-1 1.3-1.3 1.5-.2.3-.5.3-.9.1-.4-.2-1.7-.6-3.2-2-1.2-1-2-2.3-2.2-2.7-.2-.4 0-.6.2-.8.2-.2.4-.5.6-.7.2-.2.3-.4.4-.7.1-.3 0-.5-.1-.7-.1-.2-.9-2.1-1.2-2.9-.3-.8-.6-.6-.9-.7-.2 0-.5 0-.7 0-.2 0-.7.1-1 .5-.3.4-1.3 1.3-1.3 3.1 0 1.8 1.3 3.6 1.5 3.8.2.3 2.6 4 6.4 5.6 2.3.9 3.1.9 4.2.8 1-.1 2.3-.9 2.6-1.9.3-1 .3-1.8.2-1.9-.1-.2-.4-.3-.7-.5z"/></svg>
+        WhatsApp
+      </a>` : '';
+      return `<div class="item-card pedido-card" role="button" tabindex="0" onclick="abrirPedido('${p.id}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();abrirPedido('${p.id}')}">
+        <div class="pedido-card__head">
+          <div class="pedido-card__cliente">${esc(p.cliente)||'Sin cliente'}</div>
+          <div class="pedido-card__meta">
+            <span class="md-chip status ${em.tono}">${em.lbl}</span>
+            ${p.pagado?'<span class="md-chip status success">Pagado</span>':'<span class="md-chip status neutral">Por cobrar</span>'}
+          </div>
+        </div>
+        <div class="pedido-card__fecha">📅 Entrega: ${fmtFecha(p.fechaEntrega)}${waBtn}</div>
+        ${items?`<ul class="pedido-card__items">${items}</ul>`:'<div class="pedido-card__items"><small>Sin productos</small></div>'}
+        ${p.notas?`<div class="pedido-card__notas">📝 ${esc(p.notas)}</div>`:''}
+      </div>`;
+    }).join('') + `</div>`;
+  }
+  vista.innerHTML=html;
+}
+
+/* ---------- Modal Pedido ---------- */
+let edPCache = null, edPCacheOrig = null, edPDescontar = true;
+function abrirPedido(id){
+  const p = id ? pedidos.find(x=>x.id===id) : null;
+  edPCache = p ? JSON.parse(JSON.stringify(p)) : {id:uid(), cliente:'', celular:'', fechaEntrega:'', estado:'pendiente', pagado:false, items:[], notas:'', stockDescontado:false};
+  if(edPCache.celular===undefined) edPCache.celular='';
+  if(typeof edPCache.stockDescontado!=='boolean') edPCache.stockDescontado = false;
+  edPCacheOrig = p ? {estado:p.estado, stockDescontado:!!p.stockDescontado} : {estado:'pendiente', stockDescontado:false};
+  edPDescontar = true; // switch ON por default
+  dibujarPedido(!id);
+  overlay.classList.add('open');
+}
+function dibujarPedido(esNuevo){
+  const p = edPCache;
+  modal.innerHTML = `
+    <div class="modal-head">
+      <h2>${esNuevo?'Nuevo pedido':'Editar pedido'}</h2>
+      <button class="md-icon-button" type="button" onclick="cerrar()" aria-label="Cerrar">
+        <span class="material-symbols-rounded">close</span>
+      </button>
+    </div>
+
+    <div class="field">
+      <div class="md-text-field">
+        <input class="md-text-field__input" id="p-cli" placeholder=" " value="${esc(p.cliente)}" oninput="campoP('cliente',this.value)">
+        <label class="md-text-field__label" for="p-cli">Cliente</label>
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="md-text-field">
+        <input class="md-text-field__input" id="p-cel" type="tel" inputmode="tel" placeholder=" " value="${esc(p.celular)}" oninput="campoP('celular',this.value)">
+        <label class="md-text-field__label" for="p-cel">Celular (opcional, para abrir WhatsApp)</label>
+      </div>
+    </div>
+
+    <div class="row2">
+      <div class="field">
+        <div class="md-text-field has-value">
+          <input class="md-text-field__input" id="p-fec" type="date" value="${p.fechaEntrega||''}" oninput="campoP('fechaEntrega',this.value)">
+          <label class="md-text-field__label" for="p-fec">Fecha de entrega</label>
+        </div>
+      </div>
+      <div class="field">
+        <div class="md-text-field has-value">
+          <select class="md-text-field__select" id="p-est" onchange="campoP('estado',this.value)">
+            ${ESTADOS.map(e=>`<option value="${e.v}" ${e.v===p.estado?'selected':''}>${e.lbl}</option>`).join('')}
+          </select>
+          <label class="md-text-field__label" for="p-est">Estado</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="switch-row">
+      <span class="switch-row__label">¿Está pagado?</span>
+      <label class="md-switch">
+        <input type="checkbox" id="p-pag" ${p.pagado?'checked':''} onchange="campoP('pagado',this.checked)">
+        <span class="md-switch__track"><span class="md-switch__thumb"></span></span>
+      </label>
+    </div>
+
+    <div class="switch-row">
+      <span class="switch-row__label">
+        Descontar del stock al entregar
+        <small style="display:block; font-size:11px; font-weight:400; color:var(--md-sys-color-on-surface-variant); margin-top:2px">Si está OFF, no toca el stock (útil para cargar pedidos viejos).</small>
+      </span>
+      <label class="md-switch">
+        <input type="checkbox" id="p-desc" ${edPDescontar?'checked':''} onchange="edPDescontar=this.checked">
+        <span class="md-switch__track"><span class="md-switch__thumb"></span></span>
+      </label>
+    </div>
+
+    <label class="label-line">Productos del pedido</label>
+    <div id="p-items"></div>
+    <button class="md-button outlined size-sm" type="button" onclick="agregarItemPedido()" style="margin:4px 0 12px">
+      <span class="material-symbols-rounded">add</span> Agregar producto
+    </button>
+    <div class="lines" style="margin: 4px 0 14px">
+      <div class="line total"><span>Total del pedido</span><span class="v" id="p-total">—</span></div>
+    </div>
+
+    <div class="field">
+      <div class="md-text-field">
+        <textarea class="md-text-field__input" id="p-not" placeholder=" " style="min-height:60px; padding-top:24px" oninput="campoP('notas',this.value)">${esc(p.notas)}</textarea>
+        <label class="md-text-field__label" for="p-not">Notas (opcional)</label>
+      </div>
+    </div>
+
+    <div class="action-bar">
+      ${esNuevo?'':`<button class="md-button destructive outlined" type="button" onclick="borrarPedido('${p.id}')"><span class="material-symbols-rounded">delete</span> Borrar</button>`}
+      <button class="md-button filled" type="button" onclick="guardarPedido()"><span class="material-symbols-rounded">save</span> Guardar pedido</button>
+    </div>`;
+  dibujarItemsPedido();
+}
+function dibujarItemsPedido(){
+  const cont = document.getElementById('p-items'); if(!cont) return;
+  if(edPCache.items.length===0){
+    cont.innerHTML = `<p class="hint" style="margin-bottom:10px">Todavía no agregaste productos.</p>`;
+    refrescarTotalPedido();
+    return;
+  }
+  cont.innerHTML = edPCache.items.map((it,idx)=>{
+    const opts = recetas.map(r=>`<option value="${r.id}" ${r.id===it.recetaId?'selected':''}>${esc(r.nombre)} (${r.unidadVenta||'unidad'})</option>`).join('');
+    const r = recetas.find(x=>x.id===it.recetaId);
+    const uvLbl = r ? `/${r.unidadVenta||'unidad'}` : '';
+    return `<div class="pedido-item-row">
+      <select class="select-tight" onchange="setItemReceta(${idx}, this.value)">
+        <option value="">— Elegí producto —</option>
+        ${opts}
+      </select>
+      <input class="input-tight" type="number" inputmode="decimal" placeholder="cant." value="${it.cantidad||''}" oninput="setItemCantidad(${idx}, this.value)">
+      <div class="pedido-item-row__precio">
+        <span class="pedido-item-row__prefix">$</span>
+        <input class="input-tight" type="number" inputmode="decimal" placeholder="precio${uvLbl}" value="${it.precio==null||it.precio===''?'':it.precio}" oninput="setItemPrecio(${idx}, this.value)">
+      </div>
+      <button class="md-icon-button destructive" type="button" onclick="quitarItemPedido(${idx})" aria-label="Quitar">
+        <span class="material-symbols-rounded">close</span>
+      </button>
+    </div>`;
+  }).join('');
+  refrescarTotalPedido();
+}
+function totalPedido(){
+  return (edPCache.items||[]).reduce((t,it)=> t + num(it.cantidad) * num(it.precio), 0);
+}
+function refrescarTotalPedido(){
+  const el = document.getElementById('p-total'); if(!el) return;
+  const total = totalPedido();
+  el.textContent = total>0 ? $(total) : '—';
+}
+function campoP(c,v){ edPCache[c] = v; }
+function agregarItemPedido(){ edPCache.items.push({recetaId:'', cantidad:'', precio:''}); dibujarItemsPedido(); }
+function quitarItemPedido(idx){ edPCache.items.splice(idx,1); dibujarItemsPedido(); }
+function setItemReceta(idx, v){
+  edPCache.items[idx].recetaId = v;
+  // Autocompletar precio con el de la receta si el item no tenía precio
+  const r = recetas.find(x=>x.id===v);
+  if(r && (edPCache.items[idx].precio==null || edPCache.items[idx].precio==='' || num(edPCache.items[idx].precio)===0)){
+    edPCache.items[idx].precio = num(r.precio) || '';
+  }
+  dibujarItemsPedido();
+}
+function setItemCantidad(idx, v){ edPCache.items[idx].cantidad = v; refrescarTotalPedido(); }
+function setItemPrecio(idx, v){ edPCache.items[idx].precio = v; refrescarTotalPedido(); }
+function ajustarStockPedido(p, signo){
+  // signo=-1 descuenta, signo=+1 reintegra. Convierte a unidades atómicas.
+  (p.items||[]).forEach(it=>{
+    const r = recetas.find(x=>x.id===it.recetaId); if(!r) return;
+    const por = unidadesPorVenta(r.unidadVenta||'unidad');
+    r.stock = (r.stock||0) + signo * num(it.cantidad) * por;
+  });
+}
+async function guardarPedido(){
+  const p = edPCache;
+  p.cliente = (p.cliente||'').trim();
+  if(!p.cliente){ toast('Ponele el nombre del cliente 🙂'); return; }
+  p.items = (p.items||[]).filter(it=>it.recetaId && num(it.cantidad)>0);
+
+  // Lógica de stock al guardar
+  const eraEntregado = edPCacheOrig.estado==='entregado' && edPCacheOrig.stockDescontado;
+  const esEntregado  = p.estado==='entregado';
+  let mensajeStock = '';
+  if(esEntregado && !eraEntregado && edPDescontar){
+    ajustarStockPedido(p, -1);
+    p.stockDescontado = true;
+    mensajeStock = ' · stock actualizado';
+  } else if(!esEntregado && eraEntregado){
+    // revertí entregado → reintegro
+    ajustarStockPedido(p, +1);
+    p.stockDescontado = false;
+    mensajeStock = ' · stock reintegrado';
+  } else if(esEntregado && !edPDescontar){
+    p.stockDescontado = false; // marca que no se descontó
+  }
+
+  const idx = pedidos.findIndex(x=>x.id===p.id);
+  if(idx===-1) pedidos.push(p); else pedidos[idx]=p;
+  await guardarTodo(); cerrar(); render(); toast('Pedido guardado ✓'+mensajeStock);
+}
+async function borrarPedido(id){
+  if(!confirm('¿Borrar este pedido?')) return;
+  pedidos = pedidos.filter(x=>x.id!==id);
+  await guardarTodo(); cerrar(); render(); toast('Pedido borrado');
+}
+
+/* ----- Vista Stock ----- */
+function renderStock(){
+  let html = '';
+  if(recetas.length===0){
+    html = `<div class="md-card outlined section">
+      <div class="empty">
+        <span class="material-symbols-rounded">warehouse</span>
+        <p class="empty-title">Sin productos para tener stock</p>
+        <small>Cargá una receta en la pestaña de Recetas y después podés llevar stock acá.</small>
+      </div>
+    </div>`;
+  } else {
+    html = `<div class="md-card outlined section" style="padding:14px 16px; margin-bottom:14px">
+      <p class="hint" style="margin:0">Stock en unidades individuales (cada alfajor, cada muffin…). Al entregar un pedido con el switch ON, el stock se descuenta solo.</p>
+    </div>`;
+    html += `<div class="stack">` + recetas.map(r=>{
+      const uv = r.unidadVenta||'unidad';
+      const por = unidadesPorVenta(uv);
+      const enDocenas = por>1 ? ` · ≈ ${Math.floor((r.stock||0)/por)} ${pluralUnidad(uv, Math.floor((r.stock||0)/por))}` : '';
+      return `<div class="stock-card">
+        <div class="stock-card__top">
+          <div class="stock-card__info">
+            <div class="prod-tbl__name">${esc(r.nombre)}</div>
+            <div class="prod-tbl__unit">Por ${uv}${por>1?` · ×${por}`:''}${enDocenas}</div>
+          </div>
+          <div class="stock-card__big">${r.stock||0} <small>u</small></div>
+        </div>
+        <div class="stock-card__actions">
+          <button class="md-button outlined size-sm" type="button" onclick="ajustarStock('${r.id}', -${por})">−${por>1?por:1}</button>
+          <button class="md-button outlined size-sm" type="button" onclick="ajustarStock('${r.id}', -1)">−1</button>
+          <input class="input-tight stock-card__input" type="number" inputmode="numeric" value="${r.stock||0}" onchange="setStock('${r.id}', this.value)">
+          <button class="md-button outlined size-sm" type="button" onclick="ajustarStock('${r.id}', 1)">+1</button>
+          <button class="md-button outlined size-sm" type="button" onclick="ajustarStock('${r.id}', ${por})">+${por>1?por:1}</button>
+        </div>
+      </div>`;
+    }).join('') + `</div>`;
+  }
+  vista.innerHTML=html;
+}
+async function ajustarStock(recetaId, delta){
+  const r = recetas.find(x=>x.id===recetaId); if(!r) return;
+  r.stock = Math.max(0, (r.stock||0) + delta);
+  await guardarTodo(); render();
+}
+async function setStock(recetaId, valor){
+  const r = recetas.find(x=>x.id===recetaId); if(!r) return;
+  r.stock = Math.max(0, Math.floor(num(valor)));
+  await guardarTodo(); render();
+}
+
+/* ----- Vista Insumos ----- */
+function renderInsumos(){
+  let html = `<div class="add-bar"><button class="md-button filled" type="button" onclick="abrirInsumo()">
+    <span class="material-symbols-rounded">add</span> Nuevo insumo
+  </button></div>`;
+  if(insumos.length===0){
+    html += `<div class="md-card outlined section">
+      <div class="empty">
+        <span class="material-symbols-rounded">inventory_2</span>
+        <p class="empty-title">Cargá tus insumos</p>
+        <small>Ej: "Dulce de leche — $8.000 por 5 kg". Yo calculo solo cuánto sale el gramo.</small>
+      </div>
+    </div>`;
+  } else {
+    html += `<div class="stack">` + insumos.map(ins=>{
+      const cpb=costoPorBase(ins);
+      const fam=UNITS[ins.unidad].fam;
+      const porGrande = fam==='peso'?`${moneda.format(cpb*1000)}/kg`
+                      : fam==='volumen'?`${moneda.format(cpb*1000)}/l`
+                      : `${moneda.format(cpb)} c/u`;
+      const sinPrecio = num(ins.costoCompra)<=0;
+      const chip = sinPrecio
+        ? `<span class="md-chip status warning">falta precio</span>`
+        : `<span class="md-chip status neutral">editar</span>`;
+      return `<button class="item-card" type="button" onclick="abrirInsumo('${ins.id}')">
+        <div class="item-card__info">
+          <div class="item-card__name">${esc(ins.nombre)||'Sin nombre'}</div>
+          <div class="item-card__sub">${sinPrecio?'Todavía sin precio':`${$(ins.costoCompra)} por ${ins.cantidad} ${UNITS[ins.unidad].lbl} → <b>${porGrande}</b>`}</div>
+        </div>
+        ${chip}
+      </button>`;
+    }).join('') + `</div>`;
+  }
+  vista.innerHTML=html;
+}
+
+/* ----- Vista Ajustes ----- */
+function renderAjustes(){
+  vista.innerHTML = `
+  <div class="md-card outlined section">
+    <h2 class="section-title">Gas del horno 🔥</h2>
+    <div class="note">Como el horno usa gas, usamos un truco: la <b>diferencia</b> entre la boleta de gas de ella y la de otra casa parecida que no hornea. Esa diferencia es, más o menos, lo que cuesta hornear.</div>
+
+    <div class="field">
+      <div class="md-text-field with-prefix">
+        <span class="md-text-field__prefix">$</span>
+        <input class="md-text-field__input" id="g-monto" type="number" inputmode="decimal" placeholder=" " value="${config.gasMonto||''}">
+        <label class="md-text-field__label" for="g-monto">Diferencia de la boleta (del período)</label>
+      </div>
+      <p class="hint">La boleta de gas viene cada 2 meses.</p>
+    </div>
+
+    <div class="field">
+      <div class="md-text-field">
+        <input class="md-text-field__input" id="g-tandas" type="number" inputmode="decimal" placeholder=" " value="${config.gasTandas||''}">
+        <label class="md-text-field__label" for="g-tandas">¿Cuántas tandas horneaste en ese período?</label>
+      </div>
+      <p class="hint">Una "tanda" = una vez que prendés el horno.</p>
+    </div>
+
+    <div class="gas-out">Costo de gas por tanda: <span id="g-out">${$(gasPorTanda())}</span></div>
+  </div>
+
+  <div class="md-card outlined section">
+    <h2 class="section-title">Tu hora de trabajo 💪</h2>
+    <p class="hint" style="margin:-6px 0 14px">Opcional. Poné cuánto te gustaría ganar por hora como mínimo. Sirve para que el semáforo te avise si una receta paga poco.</p>
+
+    <div class="field">
+      <div class="md-text-field with-prefix">
+        <span class="md-text-field__prefix">$</span>
+        <input class="md-text-field__input" id="a-pago" type="number" inputmode="decimal" placeholder=" " value="${config.pagoRef||''}">
+        <label class="md-text-field__label" for="a-pago">Pago por hora deseado</label>
+      </div>
+    </div>
+
+    <button class="md-button filled" type="button" onclick="guardarAjustes()" style="width:100%">
+      <span class="material-symbols-rounded">save</span> Guardar ajustes
+    </button>
+  </div>
+
+  <div class="md-card outlined section">
+    <h2 class="section-title">Sesión</h2>
+    <p class="hint" style="margin:-6px 0 14px">Cerrá sesión si compartís el dispositivo con alguien que no debería ver los datos.</p>
+    <button class="md-button outlined" type="button" onclick="cerrarSesion()" style="width:100%">
+      <span class="material-symbols-rounded">logout</span> Cerrar sesión
+    </button>
+  </div>`;
+
+  const gm=document.getElementById('g-monto'), gt=document.getElementById('g-tandas');
+  const upd=()=>{config.gasMonto=num(gm.value);config.gasTandas=num(gt.value);document.getElementById('g-out').textContent=$(gasPorTanda());};
+  gm.addEventListener('input',upd); gt.addEventListener('input',upd);
+}
+async function guardarAjustes(){
+  config.gasMonto=num(document.getElementById('g-monto').value);
+  config.gasTandas=num(document.getElementById('g-tandas').value);
+  config.pagoRef=num(document.getElementById('a-pago').value);
+  await guardarTodo(); toast('Ajustes guardados ✓'); render();
+}
+
+/* ---------- Modal Insumo ---------- */
+function abrirInsumo(id){
+  const ins = id ? insumos.find(i=>i.id===id) : {id:uid(),nombre:'',costoCompra:'',cantidad:'',unidad:'kg'};
+  const esNuevo=!id;
+  modal.innerHTML=`
+    <div class="modal-head">
+      <h2>${esNuevo?'Nuevo insumo':'Editar insumo'}</h2>
+      <button class="md-icon-button" type="button" onclick="cerrar()" aria-label="Cerrar">
+        <span class="material-symbols-rounded">close</span>
+      </button>
+    </div>
+
+    <div class="field">
+      <div class="md-text-field">
+        <input class="md-text-field__input" id="i-nom" placeholder=" " value="${esc(ins.nombre)}">
+        <label class="md-text-field__label" for="i-nom">¿Qué es?</label>
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="md-text-field with-prefix">
+        <span class="md-text-field__prefix">$</span>
+        <input class="md-text-field__input" id="i-costo" type="number" inputmode="decimal" placeholder=" " value="${ins.costoCompra}">
+        <label class="md-text-field__label" for="i-costo">¿Cuánto pagaste?</label>
+      </div>
+    </div>
+
+    <div class="row2">
+      <div class="field">
+        <div class="md-text-field">
+          <input class="md-text-field__input" id="i-cant" type="number" inputmode="decimal" placeholder=" " value="${ins.cantidad}">
+          <label class="md-text-field__label" for="i-cant">¿Cuánto compraste?</label>
+        </div>
+      </div>
+      <div class="field">
+        <div class="md-text-field has-value">
+          <select class="md-text-field__select" id="i-un">
+            ${Object.keys(UNITS).map(u=>`<option value="${u}" ${u===ins.unidad?'selected':''}>${UNITS[u].lbl}</option>`).join('')}
+          </select>
+          <label class="md-text-field__label" for="i-un">Medida</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="action-bar">
+      ${esNuevo?'':`<button class="md-button destructive outlined" type="button" onclick="borrarInsumo('${ins.id}')"><span class="material-symbols-rounded">delete</span> Borrar</button>`}
+      <button class="md-button filled" type="button" onclick="guardarInsumo('${ins.id}')"><span class="material-symbols-rounded">save</span> Guardar</button>
+    </div>`;
+  overlay.classList.add('open');
+}
+async function guardarInsumo(id){
+  const ins={id, nombre:document.getElementById('i-nom').value.trim(),
+    costoCompra:num(document.getElementById('i-costo').value),
+    cantidad:num(document.getElementById('i-cant').value),
+    unidad:document.getElementById('i-un').value};
+  if(!ins.nombre){toast('Ponele un nombre 🙂');return;}
+  const idx = insumos.findIndex(i=>i.id===id);
+  if(idx===-1) insumos.push(ins); else insumos[idx]=ins;
+  await guardarTodo(); cerrar(); render(); toast('Insumo guardado ✓');
+}
+async function borrarInsumo(id){
+  const usado = recetas.some(r=>(r.ingredientes||[]).some(g=>g.insumoId===id));
+  const msg = usado ? '¡Ojo! Este insumo lo usás en alguna receta. ¿Borrar igual?' : '¿Borrar este insumo?';
+  if(!confirm(msg)) return;
+  insumos=insumos.filter(i=>i.id!==id); await guardarTodo(); cerrar(); render(); toast('Insumo borrado');
+}
+
+/* ---------- Modal Receta ---------- */
+let edRCache=null;
+function abrirReceta(id){
+  if(insumos.length===0 && !id){ toast('Primero cargá insumos en la pestaña de Insumos'); setTab('insumos'); return; }
+  const r = id ? recetas.find(x=>x.id===id) : {id:uid(),nombre:'',ingredientes:[],rinde:'',horas:'',tandas:1,precio:'',unidadVenta:'unidad'};
+  if(!r.unidadVenta) r.unidadVenta='unidad';
+  edRCache = JSON.parse(JSON.stringify(r));
+  if(!edRCache.ingredientes) edRCache.ingredientes=[];
+  dibujarReceta(!id);
+  overlay.classList.add('open');
+}
+function dibujarReceta(esNuevo){
+  const r=edRCache; const c=calcular(r); const tono=tonoHora(c.porHora);
+  let msg;
+  if(c.porHora===null) msg='Cargá las horas para ver tu ganancia por hora';
+  else if(c.porHora<0) msg='⚠️ A este precio estás perdiendo plata';
+  else if(num(config.pagoRef)>0 && c.porHora<num(config.pagoRef)) msg='Te paga menos de lo que querés por hora';
+  else msg='¡Bien! Te queda esto por cada hora de trabajo';
+
+  modal.innerHTML=`
+    <div class="modal-head">
+      <h2>${esNuevo?'Nueva receta':'Editar receta'}</h2>
+      <button class="md-icon-button" type="button" onclick="cerrar()" aria-label="Cerrar">
+        <span class="material-symbols-rounded">close</span>
+      </button>
+    </div>
+
+    <div class="field">
+      <div class="md-text-field">
+        <input class="md-text-field__input" id="r-nom" placeholder=" " value="${esc(r.nombre)}" oninput="campoR('nombre',this.value)">
+        <label class="md-text-field__label" for="r-nom">Nombre de la receta</label>
+      </div>
+    </div>
+
+    <details class="paste">
+      <summary>📋 Pegar receta y completar sola</summary>
+      <p class="paste__hint">Pegá la lista (una por línea). Saco la cantidad y la medida; lo que no tenga número lo dejo en blanco para que lo completes.</p>
+      <textarea id="r-paste" placeholder="150 g de maicena&#10;100 g de harina 0000&#10;2 yemas de huevo&#10;1 cucharadita de polvo para hornear&#10;Dulce de leche"></textarea>
+      <button class="md-button outlined size-sm" type="button" onclick="parsearReceta()">
+        <span class="material-symbols-rounded">auto_fix_high</span> Analizar y cargar ingredientes
+      </button>
+    </details>
+
+    <label class="label-line">Ingredientes que usás</label>
+    <p class="hint" style="margin:-4px 0 10px">Elegí el insumo y cuánto usás en una tanda.</p>
+    <div id="ings"></div>
+    <button class="md-button tonal size-sm" type="button" onclick="agregarIng()" style="margin: 4px 0 16px">
+      <span class="material-symbols-rounded">add</span> Agregar ingrediente
+    </button>
+
+    <div class="row2">
+      <div class="field">
+        <div class="md-text-field">
+          <input class="md-text-field__input" id="r-rinde" type="number" inputmode="decimal" placeholder=" " value="${r.rinde}" oninput="campoR('rinde',this.value)">
+          <label class="md-text-field__label" for="r-rinde">¿Cuántos te salen?</label>
+        </div>
+      </div>
+      <div class="field">
+        <div class="md-text-field has-value">
+          <select class="md-text-field__select" id="r-uv" onchange="cambioUnidadVenta(this.value)">
+            ${UNIDADES_VENTA.map(u=>`<option value="${u}" ${u===r.unidadVenta?'selected':''}>${u}</option>`).join('')}
+          </select>
+          <label class="md-text-field__label" for="r-uv">¿En qué unidad?</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="row2">
+      <div class="field">
+        <div class="md-text-field">
+          <input class="md-text-field__input" id="r-tandas" type="number" inputmode="decimal" placeholder=" " value="${r.tandas}" oninput="campoR('tandas',this.value)">
+          <label class="md-text-field__label" for="r-tandas">Tandas de horno</label>
+        </div>
+      </div>
+      <div class="field">
+        <div class="md-text-field">
+          <input class="md-text-field__input" id="r-horas" type="number" inputmode="decimal" placeholder=" " value="${r.horas}" oninput="campoR('horas',this.value)">
+          <label class="md-text-field__label" for="r-horas">Horas que le dedicaste</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="md-text-field with-prefix">
+        <span class="md-text-field__prefix">$</span>
+        <input class="md-text-field__input" id="r-precio" type="number" inputmode="decimal" placeholder=" " value="${r.precio}" oninput="campoR('precio',this.value)">
+        <label class="md-text-field__label" for="r-precio">Precio por ${r.unidadVenta}</label>
+      </div>
+    </div>
+
+    <div class="lines">
+      <div class="line"><span>Ingredientes</span><span class="v">${$(c.cInsumos)}</span></div>
+      <div class="line"><span>Gas del horno</span><span class="v">${$(c.cGas)}</span></div>
+      <div class="line total"><span>Te cuesta hacer la tanda</span><span class="v">${$(c.cTotal)}</span></div>
+      <div class="line"><span>Costo por ${r.unidadVenta}</span><span class="v">${$(c.cUnidad)}</span></div>
+      <div class="line"><span>Si vendés todo cobrás</span><span class="v">${$(c.ingreso)}</span></div>
+      <div class="line"><span>Te queda de ganancia</span><span class="v">${$(c.ganancia)}</span></div>
+    </div>
+
+    <div class="hero ${tono}">
+      <div class="hero__label">Ganás por hora</div>
+      <div class="hero__big">${c.porHora===null?'—':$(c.porHora)}</div>
+      <div class="hero__msg">${msg}</div>
+    </div>
+
+    <div class="sim">
+      <label class="sim__label" for="sim-obj">💡 ¿Querés ganar otro monto por hora? Mirá a cuánto vender</label>
+      <div class="md-text-field with-prefix">
+        <span class="md-text-field__prefix">$</span>
+        <input class="md-text-field__input" id="sim-obj" type="number" inputmode="decimal" placeholder=" " oninput="simular(this.value)">
+        <label class="md-text-field__label" for="sim-obj">Pago por hora deseado</label>
+      </div>
+      <div class="sim__result" id="sim-res">Escribí un monto y te digo el precio</div>
+    </div>
+
+    <div class="action-bar">
+      ${esNuevo?'':`<button class="md-button destructive outlined" type="button" onclick="borrarReceta('${r.id}')"><span class="material-symbols-rounded">delete</span> Borrar</button>`}
+      <button class="md-button filled" type="button" onclick="guardarReceta()"><span class="material-symbols-rounded">save</span> Guardar receta</button>
+    </div>`;
+  dibujarIngs();
+}
+function dibujarIngs(){
+  const cont=document.getElementById('ings'); if(!cont) return;
+  if(edRCache.ingredientes.length===0){ cont.innerHTML=`<p class="hint" style="margin-bottom:10px">Todavía no agregaste ingredientes.</p>`; return; }
+  cont.innerHTML = edRCache.ingredientes.map((ing,idx)=>{
+    const ins=insumos.find(i=>i.id===ing.insumoId);
+    const fam = ins?UNITS[ins.unidad].fam:'peso';
+    const unidadesValidas = FAM_UNITS[fam];
+    if(!unidadesValidas.includes(ing.unidad)) ing.unidad=unidadesValidas[0];
+    const costo = costoIngrediente(ing);
+    return `<div class="ing-row">
+      <select class="select-tight" onchange="setIngInsumo(${idx},this.value)">
+        ${insumos.map(i=>`<option value="${i.id}" ${i.id===ing.insumoId?'selected':''}>${esc(i.nombre)}</option>`).join('')}
+      </select>
+      <input class="input-tight" type="number" inputmode="decimal" placeholder="cant." value="${ing.cantidad}" oninput="setIngCant(${idx},this.value)">
+      <select class="select-tight" onchange="setIngUnidad(${idx},this.value)">
+        ${unidadesValidas.map(u=>`<option value="${u}" ${u===ing.unidad?'selected':''}>${UNITS[u].lbl}</option>`).join('')}
+      </select>
+      <button class="md-icon-button" type="button" onclick="quitarIng(${idx})" aria-label="Quitar ingrediente">
+        <span class="material-symbols-rounded">close</span>
+      </button>
+    </div><div class="ing-cost">= ${$(costo)}</div>`;
+  }).join('');
+}
+function agregarIng(){ edRCache.ingredientes.push({insumoId:insumos[0].id,cantidad:'',unidad:UNITS[insumos[0].unidad].fam==='peso'?'g':UNITS[insumos[0].unidad].fam==='volumen'?'ml':'u'}); refrescarReceta(); }
+function quitarIng(i){ edRCache.ingredientes.splice(i,1); refrescarReceta(); }
+function setIngCant(i,val){ edRCache.ingredientes[i].cantidad=val; actualizarCostosIng(); refrescarSoloResultados(); }
+function setIngUnidad(i,val){ edRCache.ingredientes[i].unidad=val; actualizarCostosIng(); refrescarSoloResultados(); }
+function setIngInsumo(i,val){ const ins=insumos.find(x=>x.id===val); edRCache.ingredientes[i].insumoId=val; const fam=UNITS[ins.unidad].fam; if(!FAM_UNITS[fam].includes(edRCache.ingredientes[i].unidad)) edRCache.ingredientes[i].unidad=FAM_UNITS[fam][FAM_UNITS[fam].length-1]; refrescarReceta(); }
+function actualizarCostosIng(){ const labels=modal.querySelectorAll('.ing-cost'); edRCache.ingredientes.forEach((ing,idx)=>{ if(labels[idx]) labels[idx].textContent='= '+$(costoIngrediente(ing)); }); }
+
+/* ----- Parser de receta pegada ----- */
+function norm(s){ return String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,' ').trim(); }
+function capitalizar(s){ s=s.trim(); return s ? s.charAt(0).toUpperCase()+s.slice(1) : s; }
+const PISTA_LIQUIDO=/(esenc|escenc|aceite|leche|agua|vinagre|miel|jugo|crema|licor|ron|coñac|conac|vino|colorante|jarabe|almibar|extracto)/;
+function familiaPorNombre(nombre){ return PISTA_LIQUIDO.test(norm(nombre)) ? 'volumen' : 'peso'; }
+function clasifUnidad(uw){
+  if(/^(g|gr|grs|gramo|gramos)$/.test(uw)) return 'g';
+  if(/^(kg|kilo|kilos|kilogramo|kilogramos)$/.test(uw)) return 'kg';
+  if(/^(ml|cc|mililitro|mililitros)$/.test(uw)) return 'ml';
+  if(/^(l|lt|lts|litro|litros)$/.test(uw)) return 'l';
+  if(/^(u|unidad|unidades)$/.test(uw)) return 'u';
+  if(/^(cucharada|cucharadas|cucharadita|cucharaditas|cda|cdas|cdta|cdtas|taza|tazas|pizca|pizcas|chorro|chorrito|gota|gotas)$/.test(uw)) return 'IGNORAR';
+  return '';
+}
+function parseLinea(raw){
+  let s = raw.replace(/^[\s*\-–—•·]+/,'').trim().replace(/\.+\s*$/,'').trim();
+  let cantidad='', unidad='', nombre='';
+  const num = s.match(/(\d+(?:[.,]\d+)?)/);
+  if(num){
+    const numero = num[1].replace(',','.');
+    const idx = num.index;
+    const before = s.slice(0, idx).trim();
+    let after = s.slice(idx + num[0].length).trim();
+    const um = after.match(/^([a-záéíóúñ]+)\.?\b\s*(.*)$/i);
+    const uw = um ? um[1].toLowerCase() : '';
+    const cls = clasifUnidad(uw);
+    if(cls === 'IGNORAR'){ after = um[2]; }
+    else if(cls){ unidad = cls; cantidad = numero; after = um[2]; }
+    else { unidad = 'u'; cantidad = numero; }
+    let resto = (before + ' ' + after).replace(/[:;]/g,' ').replace(/\s+/g,' ').trim();
+    resto = resto.replace(/^[,\-–—\s]+|[,\-–—\s]+$/g,'').replace(/^de(l)?\s+/i,'').trim();
+    if(!resto) resto = (before || after || s).replace(/[:;]/g,' ').replace(/\s+/g,' ').trim();
+    nombre = resto;
+  } else {
+    nombre = s;
+  }
+  nombre = nombre.replace(/[:.,;]+\s*$/,'').replace(/^[:.,;]+\s*/,'').trim();
+  nombre = capitalizar(nombre);
+  const fam = unidad ? UNITS[unidad].fam : familiaPorNombre(nombre);
+  const compraUnidad = fam==='peso'?'kg':fam==='volumen'?'l':'u';
+  return {cantidad, unidad, nombre, compraUnidad, fam};
+}
+const STOP=/(^|\s)(de|del|la|el|los|las|en|con|para|al|y|a|rallad[oa]|molid[oa]|picad[oa]|fresc[oa]|comun|comunes|gramo|gramos|gr|grs|kilo|kilos|kg|ml|cc|mililitro|mililitros|litro|litros|lt|lts|unidad|unidades|cucharada|cucharadas|cucharadita|cucharaditas|cda|cdas|cdta|cdtas|taza|tazas|pizca|pizcas|chorro|chorrito|gota|gotas|mediano|medianos|mediana|medianas|grande|grandes|chico|chicos|chica|chicas|repostero|reposter[oa])(\s|$)/g;
+function clavesNombre(n){
+  return norm(n)
+    .replace(/[:.,;()]/g,' ')
+    .replace(/\b\d+(?:[.,]\d+)?\b/g,' ')
+    .replace(STOP,' ')
+    .split(/\s+/).filter(w=>w.length>2);
+}
+function buscarInsumo(nombre){
+  const exacto=insumos.find(i=>norm(i.nombre)===norm(nombre));
+  if(exacto) return exacto;
+  const claves=clavesNombre(nombre);
+  if(!claves.length) return null;
+  return insumos.find(i=>{ const ic=clavesNombre(i.nombre); return claves.some(c=>ic.includes(c)); }) || null;
+}
+async function parsearReceta(){
+  const ta=document.getElementById('r-paste'); if(!ta) return;
+  const lineas=ta.value.split(/\r?\n/).map(l=>l.trim()).filter(Boolean);
+  if(!lineas.length){ toast('Pegá la lista primero 🙂'); return; }
+  let creados=0;
+  lineas.forEach(l=>{
+    const p=parseLinea(l);
+    let ins=buscarInsumo(p.nombre);
+    if(!ins){ ins={id:uid(),nombre:p.nombre,costoCompra:0,cantidad:1,unidad:p.compraUnidad}; insumos.push(ins); creados++; }
+    const fam=UNITS[ins.unidad].fam;
+    let u = (p.unidad && FAM_UNITS[fam].includes(p.unidad)) ? p.unidad : FAM_UNITS[fam][FAM_UNITS[fam].length-1];
+    edRCache.ingredientes.push({insumoId:ins.id, cantidad:p.cantidad, unidad:u});
+  });
+  await guardarTodo();
+  refrescarReceta();
+  toast(creados ? `Cargué ${lineas.length} ingredientes · ${creados} insumos nuevos sin precio` : `Cargué ${lineas.length} ingredientes ✓`);
+}
+function campoR(c,v){ edRCache[c]=v; refrescarSoloResultados(); }
+function cambioUnidadVenta(v){
+  edRCache.unidadVenta = v;
+  const lblPrecio = modal.querySelector('label[for="r-precio"]');
+  if(lblPrecio) lblPrecio.textContent = `Precio por ${v}`;
+  const lines = modal.querySelectorAll('.lines .line span:first-child');
+  if(lines.length>=4) lines[3].textContent = `Costo por ${v}`;
+}
+
+function refrescarReceta(){
+  const scroll=modal.scrollTop; dibujarReceta(false); modal.scrollTop=scroll;
+}
+function refrescarSoloResultados(){
+  const r=edRCache, c=calcular(r), tono=tonoHora(c.porHora);
+  const hero=modal.querySelector('.hero'); const des=modal.querySelector('.lines');
+  if(des){ const vs=des.querySelectorAll('.v'); vs[0].textContent=$(c.cInsumos);vs[1].textContent=$(c.cGas);vs[2].textContent=$(c.cTotal);vs[3].textContent=$(c.cUnidad);vs[4].textContent=$(c.ingreso);vs[5].textContent=$(c.ganancia); }
+  if(hero){ hero.className='hero '+tono; hero.querySelector('.hero__big').textContent=c.porHora===null?'—':$(c.porHora);
+    let msg; if(c.porHora===null)msg='Cargá las horas para ver tu ganancia por hora'; else if(c.porHora<0)msg='⚠️ A este precio estás perdiendo plata'; else if(num(config.pagoRef)>0&&c.porHora<num(config.pagoRef))msg='Te paga menos de lo que querés por hora'; else msg='¡Bien! Te queda esto por cada hora de trabajo';
+    hero.querySelector('.hero__msg').textContent=msg; }
+}
+function simular(v){
+  const obj=num(v); const r=edRCache; const c=calcular(r); const out=document.getElementById('sim-res');
+  if(obj<=0||c.rinde<=0){ out.textContent='Escribí un monto y te digo el precio'; return; }
+  const precio=(c.cTotal+obj*num(r.horas))/c.rinde;
+  out.innerHTML=`Vendé cada ${r.unidadVenta||'unidad'} a <b>${$(precio)}</b>`;
+}
+async function guardarReceta(){
+  const r=edRCache; r.nombre=(r.nombre||'').trim();
+  if(!r.nombre){toast('Ponele un nombre a la receta 🙂');return;}
+  const idx = recetas.findIndex(x=>x.id===r.id);
+  if(idx===-1) recetas.push(r); else recetas[idx]=r;
+  await guardarTodo(); cerrar(); render(); toast('Receta guardada ✓');
+}
+async function borrarReceta(id){ if(!confirm('¿Borrar esta receta?'))return; recetas=recetas.filter(x=>x.id!==id); await guardarTodo(); cerrar(); render(); toast('Receta borrada'); }
+
+/* ---------- Util ---------- */
+function cerrar(){ overlay.classList.remove('open'); }
+overlay.addEventListener('click',e=>{ if(e.target===overlay) cerrar(); });
+function esc(s){ return String(s||'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m])); }
+let toastT;
+function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),2400); }
+
+/* ---------- Insumos precargados (solo en el primer arranque) ---------- */
+const SEED_INSUMOS=[
+  {id:'seed-dulce',   nombre:'Dulce de Leche',     costoCompra:44000, cantidad:10, unidad:'kg'},
+  {id:'seed-coco',    nombre:'Coco Rallado',       costoCompra:38428, cantidad:5,  unidad:'kg'},
+  {id:'seed-maicena', nombre:'Maicena',            costoCompra:8.63,  cantidad:5,  unidad:'kg'},
+  {id:'seed-harina',  nombre:'Harina',             costoCompra:2000,  cantidad:1,  unidad:'kg'},
+  {id:'seed-azucar',  nombre:'Azúcar',             costoCompra:1600,  cantidad:1,  unidad:'kg'},
+  {id:'seed-manteca', nombre:'manteca',            costoCompra:72411, cantidad:5,  unidad:'kg'},
+  {id:'seed-vainilla',nombre:'Escencia Vainilla',  costoCompra:5400,  cantidad:1,  unidad:'l'},
+  {id:'seed-polvo',   nombre:'Polvo para hornear', costoCompra:16300, cantidad:3,  unidad:'kg'},
+  {id:'seed-huevos',  nombre:'huevos',             costoCompra:7000,  cantidad:30, unidad:'u'}
+];
+
+/* ---------- Sesión y arranque ---------- */
+async function iniciarApp(){
+  const si = await cargar('insumos', null);
+  if(si===null){ insumos = SEED_INSUMOS.slice(); await guardar('insumos', insumos); }
+  else insumos = si;
+  recetas = await cargar('recetas',[]);
+  recetas.forEach(r=>{ if(typeof r.stock!=='number') r.stock = 0; });
+  pedidos = await cargar('pedidos',[]);
+  pedidos.forEach(p=>{ if(typeof p.stockDescontado!=='boolean') p.stockDescontado = false; });
+  config  = await cargar('config',{gasMonto:0,gasTandas:1,pagoRef:0});
+  render();
+}
+
+async function iniciarSesion(ev){
+  ev.preventDefault();
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-pass').value;
+  const err = document.getElementById('login-error');
+  const btn = document.getElementById('login-btn');
+  err.textContent = '';
+  btn.disabled = true;
+  try{
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if(error) throw error;
+    await mostrarApp();
+  }catch(e){
+    err.textContent = (e.message === 'Invalid login credentials')
+      ? 'Email o contraseña incorrectos'
+      : (e.message || 'No se pudo entrar');
+  }finally{
+    btn.disabled = false;
+  }
+}
+
+async function cerrarSesion(){
+  if(!confirm('¿Cerrar sesión?')) return;
+  await supabase.auth.signOut();
+  insumos = []; recetas = []; config = {gasMonto:0, gasTandas:1, pagoRef:0};
+  mostrarLogin();
+}
+
+function mostrarLogin(){
+  document.getElementById('login-screen').hidden = false;
+  document.getElementById('app').hidden = true;
+  setTimeout(()=>document.getElementById('login-email').focus(), 50);
+}
+async function mostrarApp(){
+  document.getElementById('login-screen').hidden = true;
+  document.getElementById('app').hidden = false;
+  await iniciarApp();
+}
+
+/* Exponer al window las funciones que llaman los onclick inline (innerHTML) */
+Object.assign(window, {
+  iniciarSesion, cerrarSesion,
+  abrirInsumo, guardarInsumo, borrarInsumo,
+  abrirReceta, guardarReceta, borrarReceta, parsearReceta,
+  agregarIng, quitarIng, setIngCant, setIngUnidad, setIngInsumo,
+  campoR, cambioUnidadVenta, simular, cerrar, guardarAjustes,
+  abrirPedido, guardarPedido, borrarPedido,
+  campoP, agregarItemPedido, quitarItemPedido, setItemReceta, setItemCantidad, setItemPrecio,
+  ajustarStock, setStock
+});
+
+/* Boot: ¿hay sesión guardada? Si sí, arranco la app. Si no, login. */
+(async function boot(){
+  const { data: { session } } = await supabase.auth.getSession();
+  if(session) await mostrarApp();
+  else mostrarLogin();
+})();
+</script>
+</body>
+</html>

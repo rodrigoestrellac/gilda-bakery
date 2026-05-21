@@ -1,0 +1,20 @@
+# Credenciales locales (NUNCA versionar)
+.env
+.env.*
+!.env.example
+credentials.*
+secrets.*
+
+# Verificación visual local (genera basura grande)
+screenshots/
+
+# Sistema operativo
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Editores
+.vscode/
+.idea/
+*.swp
+*~

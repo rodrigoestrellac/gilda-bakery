@@ -1,0 +1,1751 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gilda Bakery — Sistema de Diseño</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="components.css">
+<style>
+  /* ─── Layout de la documentación (no es parte del DS) ─── */
+  .doc-shell {
+    display: grid;
+    grid-template-columns: 1fr;
+    min-height: 100vh;
+  }
+  @media (min-width: 1024px) {
+    .doc-shell { grid-template-columns: 280px 1fr; }
+  }
+
+  .doc-toc {
+    background: var(--md-sys-color-surface-container-low);
+    border-bottom: 1px solid var(--md-sys-color-outline-variant);
+    padding: 16px 24px;
+    position: sticky;
+    top: 0; z-index: 50;
+  }
+  .doc-toc__brand {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 12px;
+  }
+  .doc-toc__brand-mark {
+    width: 40px; height: 40px;
+    border-radius: var(--md-sys-shape-corner-medium);
+    background: var(--md-sys-color-primary);
+    color: var(--md-sys-color-on-primary);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--md-sys-typescale-display-font);
+    font-size: 24px;
+  }
+  .doc-toc__brand-text { line-height: 1.1; }
+  .doc-toc__brand-text strong { display: block; font-weight: 900; color: var(--md-sys-color-on-surface); }
+  .doc-toc__brand-text span { color: var(--md-sys-color-on-surface-variant); font-size: 13px; }
+
+  .doc-toc__list { list-style: none; padding: 0; margin: 0; display: flex; gap: 4px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .doc-toc__list a {
+    display: block; padding: 8px 12px;
+    border-radius: var(--md-sys-shape-corner-full);
+    color: var(--md-sys-color-on-surface-variant);
+    text-decoration: none;
+    font-size: 13px; font-weight: 700;
+    white-space: nowrap;
+  }
+  .doc-toc__list a:hover { background: var(--md-sys-color-surface-container); color: var(--md-sys-color-on-surface); }
+  .doc-toc__group-title { display: none; }
+
+  @media (min-width: 1024px) {
+    .doc-toc {
+      position: sticky; top: 0; height: 100vh;
+      border-right: 1px solid var(--md-sys-color-outline-variant);
+      border-bottom: none;
+      padding: 24px 20px; overflow-y: auto;
+    }
+    .doc-toc__list { flex-direction: column; gap: 2px; overflow: visible; margin-bottom: 24px; }
+    .doc-toc__list a { padding: 8px 16px; border-radius: var(--md-sys-shape-corner-full); }
+    .doc-toc__group-title {
+      display: block;
+      font-family: var(--md-sys-typescale-label-font);
+      font-size: var(--md-sys-typescale-label-small-size);
+      font-weight: var(--md-sys-typescale-label-small-weight);
+      letter-spacing: var(--md-sys-typescale-label-small-tracking);
+      color: var(--md-sys-color-on-surface-variant);
+      text-transform: uppercase;
+      padding: 16px 16px 4px;
+    }
+  }
+
+  .doc-main { padding: 24px 16px 96px; max-width: 1100px; }
+  @media (min-width: 768px) { .doc-main { padding: 40px 40px 120px; } }
+
+  .doc-hero { margin-bottom: 56px; }
+  .doc-hero .eyebrow {
+    display: inline-block;
+    font-family: var(--md-sys-typescale-label-font);
+    font-size: var(--md-sys-typescale-label-small-size);
+    letter-spacing: var(--md-sys-typescale-label-small-tracking);
+    font-weight: 700;
+    color: var(--md-sys-color-on-surface-variant);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .doc-hero h1 {
+    font-family: var(--md-sys-typescale-display-font);
+    font-size: clamp(48px, 10vw, 96px);
+    line-height: 1;
+    color: var(--md-sys-color-primary);
+    margin: 0 0 16px;
+    font-weight: 400;
+  }
+  .doc-hero h1 .ampersand { color: var(--md-sys-color-secondary); font-style: normal; }
+  .doc-hero p.lede {
+    font-family: var(--md-sys-typescale-body-font);
+    font-size: clamp(16px, 2vw, 20px);
+    line-height: 1.5;
+    color: var(--md-sys-color-on-surface-variant);
+    max-width: 60ch;
+    margin: 0;
+  }
+  .doc-hero__meta {
+    display: flex; flex-wrap: wrap; gap: 12px; margin-top: 24px;
+  }
+
+  .doc-section { margin-bottom: 80px; scroll-margin-top: 24px; }
+  .doc-section__header {
+    display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--md-sys-color-outline-variant);
+    margin-bottom: 32px;
+  }
+  .doc-section__num {
+    font-family: var(--md-sys-typescale-display-font);
+    font-size: 40px;
+    color: var(--md-sys-color-primary);
+    line-height: 1;
+  }
+  .doc-section__title {
+    font-family: var(--md-sys-typescale-headline-font);
+    font-size: var(--md-sys-typescale-headline-medium-size);
+    line-height: var(--md-sys-typescale-headline-medium-line-height);
+    font-weight: var(--md-sys-typescale-headline-medium-weight);
+    color: var(--md-sys-color-on-surface);
+    margin: 0;
+  }
+  .doc-section__lede {
+    flex-basis: 100%;
+    color: var(--md-sys-color-on-surface-variant);
+    margin: 0;
+    font-size: 15px;
+  }
+
+  .doc-subsection { margin-bottom: 40px; }
+  .doc-subsection > h3 {
+    font-family: var(--md-sys-typescale-label-font);
+    font-size: var(--md-sys-typescale-label-small-size);
+    line-height: var(--md-sys-typescale-label-small-line-height);
+    font-weight: var(--md-sys-typescale-label-small-weight);
+    letter-spacing: var(--md-sys-typescale-label-small-tracking);
+    color: var(--md-sys-color-on-surface-variant);
+    text-transform: uppercase;
+    margin: 0 0 16px;
+  }
+
+  /* Color swatches */
+  .swatch-grid {
+    display: grid; gap: 12px;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  }
+  .swatch {
+    border-radius: var(--md-sys-shape-corner-medium);
+    overflow: hidden;
+    background: var(--md-sys-color-surface-container-low);
+    border: 1px solid var(--md-sys-color-outline-variant);
+  }
+  .swatch__color { height: 80px; border-bottom: 1px solid var(--md-sys-color-outline-variant); }
+  .swatch__meta { padding: 12px 14px; }
+  .swatch__name { font-weight: 700; font-size: 14px; color: var(--md-sys-color-on-surface); }
+  .swatch__hex {
+    font-family: ui-monospace, 'SFMono-Regular', Menlo, monospace;
+    font-size: 12px; color: var(--md-sys-color-on-surface-variant); margin-top: 2px;
+  }
+  .swatch__token {
+    display: block; margin-top: 8px;
+    font-family: ui-monospace, monospace;
+    font-size: 10px;
+    color: var(--md-sys-color-tertiary);
+    word-break: break-all;
+  }
+
+  /* Role pairing card — primary + on-primary together */
+  .role-pair {
+    border-radius: var(--md-sys-shape-corner-medium);
+    overflow: hidden;
+    display: grid; grid-template-columns: 1fr 1fr;
+  }
+  .role-pair__main, .role-pair__on { padding: 16px; min-height: 88px; display: flex; flex-direction: column; justify-content: space-between; }
+  .role-pair__main .name, .role-pair__on .name { font-weight: 700; font-size: 13px; }
+  .role-pair__main .hex,  .role-pair__on .hex  { font-family: monospace; font-size: 11px; opacity: .8; }
+
+  /* Type specimen */
+  .type-row {
+    display: grid; grid-template-columns: 1fr; gap: 4px;
+    padding: 20px 0; border-bottom: 1px dashed var(--md-sys-color-outline-variant);
+  }
+  @media (min-width: 768px) { .type-row { grid-template-columns: 180px 1fr; gap: 24px; align-items: baseline; } }
+  .type-row__meta {
+    font-family: ui-monospace, monospace;
+    font-size: 11px; color: var(--md-sys-color-on-surface-variant); line-height: 1.4;
+  }
+  .type-row__meta b { color: var(--md-sys-color-on-surface); display: block; font-family: var(--md-sys-typescale-label-font); font-size: 13px; }
+  .type-row__sample { color: var(--md-sys-color-on-surface); }
+
+  /* Shape demo */
+  .shape-grid {
+    display: grid; gap: 16px;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  }
+  .shape-cell {
+    background: var(--md-sys-color-primary-container);
+    color: var(--md-sys-color-on-primary-container);
+    aspect-ratio: 1;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+    text-align: center;
+    padding: 12px;
+  }
+  .shape-cell b { font-size: 13px; }
+  .shape-cell span { font-family: monospace; font-size: 11px; opacity: .75; }
+
+  /* Elevation demo */
+  .elev-grid {
+    display: grid; gap: 24px;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    padding: 24px;
+    background: var(--md-sys-color-background);
+    border-radius: var(--md-sys-shape-corner-large);
+  }
+  .elev-cell {
+    background: var(--md-sys-color-surface-container-low);
+    border-radius: var(--md-sys-shape-corner-medium);
+    aspect-ratio: 1;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+    text-align: center; padding: 8px;
+  }
+  .elev-cell b { font-size: 13px; color: var(--md-sys-color-on-surface); }
+  .elev-cell span { font-family: monospace; font-size: 10px; color: var(--md-sys-color-on-surface-variant); }
+
+  /* Spacing demo */
+  .space-row {
+    display: flex; align-items: center; gap: 16px;
+    padding: 8px 0; border-bottom: 1px dashed var(--md-sys-color-outline-variant);
+  }
+  .space-row__meta { width: 140px; font-family: monospace; font-size: 12px; color: var(--md-sys-color-on-surface-variant); }
+  .space-row__meta b { color: var(--md-sys-color-on-surface); font-family: var(--md-sys-typescale-label-font); font-size: 13px; }
+  .space-row__bar { height: 16px; background: var(--md-sys-color-primary); border-radius: 2px; }
+
+  /* Demo panel — neutral container for showing components */
+  .demo {
+    background: var(--md-sys-color-surface-container-low);
+    border: 1px solid var(--md-sys-color-outline-variant);
+    border-radius: var(--md-sys-shape-corner-large);
+    padding: 24px;
+    margin-bottom: 16px;
+  }
+  .demo--dense { padding: 16px; }
+  .demo--flex {
+    display: flex; flex-wrap: wrap; gap: 12px; align-items: center;
+  }
+  .demo--grid {
+    display: grid; gap: 16px;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  }
+  .demo--center { display: flex; align-items: center; justify-content: center; min-height: 120px; }
+
+  .demo__label {
+    display: block;
+    font-family: var(--md-sys-typescale-label-font);
+    font-size: var(--md-sys-typescale-label-small-size);
+    font-weight: 700;
+    letter-spacing: var(--md-sys-typescale-label-small-tracking);
+    color: var(--md-sys-color-on-surface-variant);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  /* Icon gallery */
+  .icon-gallery {
+    display: grid; gap: 8px;
+    grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  }
+  .icon-cell {
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    padding: 16px 8px;
+    background: var(--md-sys-color-surface-container);
+    border-radius: var(--md-sys-shape-corner-medium);
+    color: var(--md-sys-color-on-surface);
+  }
+  .icon-cell .name { font-family: monospace; font-size: 10px; color: var(--md-sys-color-on-surface-variant); text-align: center; }
+
+  /* Code block */
+  .code-block {
+    background: var(--md-sys-color-inverse-surface);
+    color: var(--md-sys-color-inverse-on-surface);
+    border-radius: var(--md-sys-shape-corner-medium);
+    padding: 16px;
+    overflow-x: auto;
+    font-family: ui-monospace, 'SFMono-Regular', Menlo, monospace;
+    font-size: 12px;
+    line-height: 1.55;
+    margin: 0;
+  }
+  .code-block .c-comment { color: var(--md-sys-color-inverse-primary); opacity: 0.7; }
+  .code-block .c-prop    { color: #FFD6A8; }
+  .code-block .c-val     { color: #D4EAD6; }
+
+  /* App preview frames */
+  .preview-row {
+    display: grid; gap: 24px;
+    grid-template-columns: 1fr;
+  }
+  @media (min-width: 900px) {
+    .preview-row.cols-2 { grid-template-columns: 1fr 1fr; }
+    .preview-row.cols-3 { grid-template-columns: repeat(3, 1fr); }
+  }
+  .phone {
+    width: 100%; max-width: 360px; margin: 0 auto;
+    background: var(--md-sys-color-surface);
+    border: 8px solid var(--brand-chocolate);
+    border-radius: 40px;
+    overflow: hidden;
+    box-shadow: var(--md-sys-elevation-level3);
+    aspect-ratio: 9 / 19.5;
+    display: flex; flex-direction: column;
+  }
+  .phone__notch {
+    height: 24px; flex-shrink: 0;
+    background: var(--brand-chocolate);
+    display: flex; align-items: center; justify-content: center;
+    color: rgba(255,255,255,.7); font-size: 10px; font-weight: 700;
+    letter-spacing: 1px;
+  }
+  .phone__screen {
+    flex: 1; overflow-y: auto;
+    background: var(--md-sys-color-background);
+    display: flex; flex-direction: column;
+  }
+  .phone-caption {
+    margin-top: 12px; text-align: center;
+    font-family: var(--md-sys-typescale-label-font);
+    font-size: 13px;
+    color: var(--md-sys-color-on-surface-variant);
+    font-weight: 700;
+  }
+
+  .desktop-frame {
+    background: var(--md-sys-color-surface);
+    border: 1px solid var(--md-sys-color-outline-variant);
+    border-radius: var(--md-sys-shape-corner-large);
+    overflow: hidden;
+    box-shadow: var(--md-sys-elevation-level2);
+  }
+  .desktop-frame__bar {
+    height: 36px; background: var(--md-sys-color-surface-container);
+    display: flex; align-items: center; gap: 8px; padding: 0 14px;
+    border-bottom: 1px solid var(--md-sys-color-outline-variant);
+  }
+  .desktop-frame__dot { width: 12px; height: 12px; border-radius: 50%; background: var(--md-sys-color-outline-variant); }
+  .desktop-frame__dot:nth-child(1) { background: #E08B7C; }
+  .desktop-frame__dot:nth-child(2) { background: #E6C772; }
+  .desktop-frame__dot:nth-child(3) { background: #98C2A0; }
+  .desktop-frame__body { display: flex; min-height: 540px; }
+
+  /* App: ficha de receta (mobile content) */
+  .app { display: flex; flex-direction: column; flex: 1; }
+  .app__content { flex: 1; padding: 16px; display: flex; flex-direction: column; gap: 16px; overflow-y: auto; }
+  .app__content--tight { gap: 12px; }
+
+  .recipe-card { padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+  .recipe-card__header { display: flex; align-items: flex-start; gap: 12px; justify-content: space-between; }
+  .recipe-card__title {
+    font-family: var(--md-sys-typescale-display-font);
+    font-size: 28px; line-height: 1.1;
+    color: var(--md-sys-color-primary);
+  }
+  .recipe-card__sub {
+    font-size: 13px;
+    color: var(--md-sys-color-on-surface-variant);
+    margin-top: 4px;
+  }
+  .recipe-card__stats {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 8px; padding: 12px; background: var(--md-sys-color-surface-container-high);
+    border-radius: var(--md-sys-shape-corner-medium);
+  }
+  .stat { text-align: center; }
+  .stat__label {
+    font-family: var(--md-sys-typescale-label-font);
+    font-size: 10px; font-weight: 700; letter-spacing: 0.5px;
+    color: var(--md-sys-color-on-surface-variant); text-transform: uppercase;
+  }
+  .stat__value {
+    font-family: var(--md-sys-typescale-title-font);
+    font-size: 18px; font-weight: 900;
+    color: var(--md-sys-color-on-surface);
+    margin-top: 2px;
+  }
+  .stat__value.positive { color: var(--md-sys-color-success); }
+  .stat__value.primary  { color: var(--md-sys-color-primary); }
+
+  /* Ingredient row */
+  .ingredient-row {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 12px 16px;
+    background: var(--md-sys-color-surface-container-low);
+    border-radius: var(--md-sys-shape-corner-medium);
+  }
+  .ingredient-row__name { font-weight: 700; font-size: 15px; color: var(--md-sys-color-on-surface); }
+  .ingredient-row__sub  { font-size: 12px; color: var(--md-sys-color-on-surface-variant); margin-top: 2px; }
+  .ingredient-row__cost {
+    font-family: var(--md-sys-typescale-title-font); font-weight: 700; font-size: 15px;
+    color: var(--md-sys-color-on-surface);
+  }
+
+  /* Hero result (ingreso por hora) */
+  .hero-result {
+    text-align: center; padding: 28px 20px;
+    border-radius: var(--md-sys-shape-corner-large);
+    background: var(--md-sys-color-secondary-container);
+    color: var(--md-sys-color-on-secondary-container);
+  }
+  .hero-result__label {
+    font-family: var(--md-sys-typescale-label-font); font-size: 11px;
+    font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; opacity: 0.85;
+  }
+  .hero-result__big {
+    font-family: var(--md-sys-typescale-display-font);
+    font-size: 56px; line-height: 1; margin: 8px 0 4px;
+  }
+  .hero-result__msg { font-size: 13px; font-weight: 700; }
+
+  /* Ingredient card (stock card) */
+  .stock-card {
+    background: var(--md-sys-color-surface-container-low);
+    border-radius: var(--md-sys-shape-corner-medium);
+    overflow: hidden;
+    border-top: 4px solid transparent;
+  }
+  .stock-card.ok { border-top-color: var(--md-sys-color-success); }
+  .stock-card.warn { border-top-color: var(--md-sys-color-warning); }
+  .stock-card.crit { border-top-color: var(--md-sys-color-error); }
+  .stock-card__body { padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+  .stock-card__top { display: flex; align-items: flex-start; gap: 12px; justify-content: space-between; }
+  .stock-card__name { font-weight: 900; font-size: 16px; color: var(--md-sys-color-on-surface); }
+  .stock-card__cat  { font-size: 11px; font-weight: 700; letter-spacing: 0.5px; color: var(--md-sys-color-on-surface-variant); text-transform: uppercase; margin-top: 2px; }
+  .stock-card__row {
+    display: flex; justify-content: space-between; align-items: baseline;
+    font-size: 13px; color: var(--md-sys-color-on-surface-variant);
+  }
+  .stock-card__row b { color: var(--md-sys-color-on-surface); font-size: 16px; }
+  .stock-card__meta {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+    padding-top: 12px; border-top: 1px solid var(--md-sys-color-outline-variant);
+  }
+  .stock-card__meta .label { font-size: 10px; font-weight: 700; letter-spacing: 0.4px; color: var(--md-sys-color-on-surface-variant); text-transform: uppercase; }
+  .stock-card__meta .value { font-size: 14px; font-weight: 700; color: var(--md-sys-color-on-surface); margin-top: 2px; }
+  .stock-card__meta .value.cost { color: var(--md-sys-color-primary); }
+
+  /* Empty state */
+  .empty-state {
+    text-align: center; padding: 40px 24px;
+    color: var(--md-sys-color-on-surface-variant);
+  }
+  .empty-state .material-symbols-rounded { font-size: 64px; color: var(--md-sys-color-tertiary); margin-bottom: 12px; }
+  .empty-state h4 { font-family: var(--md-sys-typescale-title-font); font-size: 18px; font-weight: 700; color: var(--md-sys-color-on-surface); margin: 0 0 4px; }
+
+  /* Two-col split inside main area */
+  .split-2 {
+    display: grid; gap: 16px;
+    grid-template-columns: 1fr;
+  }
+  @media (min-width: 600px) { .split-2 { grid-template-columns: 1fr 1fr; } }
+  .split-3 {
+    display: grid; gap: 16px;
+    grid-template-columns: 1fr;
+  }
+  @media (min-width: 600px) { .split-3 { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 900px) { .split-3 { grid-template-columns: repeat(3, 1fr); } }
+
+  /* Principles cards */
+  .principle {
+    padding: 20px;
+    background: var(--md-sys-color-surface-container-low);
+    border-radius: var(--md-sys-shape-corner-large);
+    border-left: 4px solid var(--md-sys-color-primary);
+  }
+  .principle:nth-child(2) { border-left-color: var(--md-sys-color-secondary); }
+  .principle:nth-child(3) { border-left-color: var(--md-sys-color-tertiary); }
+  .principle h4 {
+    font-family: var(--md-sys-typescale-title-font);
+    font-size: 18px; font-weight: 700;
+    color: var(--md-sys-color-on-surface); margin: 0 0 8px;
+  }
+  .principle p { margin: 0; font-size: 14px; color: var(--md-sys-color-on-surface-variant); }
+
+  /* Inline pill for IDs */
+  .pill {
+    display: inline-block; padding: 2px 8px;
+    background: var(--md-sys-color-tertiary-container);
+    color: var(--md-sys-color-on-tertiary-container);
+    border-radius: var(--md-sys-shape-corner-extra-small);
+    font-family: monospace; font-size: 11px;
+  }
+</style>
+</head>
+<body>
+<div class="doc-shell">
+
+  <!-- ═══════════════ TOC ═══════════════ -->
+  <aside class="doc-toc">
+    <div class="doc-toc__brand">
+      <div class="doc-toc__brand-mark">G</div>
+      <div class="doc-toc__brand-text">
+        <strong>Gilda Bakery</strong>
+        <span>Design System v1.0</span>
+      </div>
+    </div>
+
+    <nav>
+      <span class="doc-toc__group-title">Inicio</span>
+      <ul class="doc-toc__list">
+        <li><a href="#intro">Introducción</a></li>
+        <li><a href="#principios">Principios</a></li>
+      </ul>
+      <span class="doc-toc__group-title">Foundations</span>
+      <ul class="doc-toc__list">
+        <li><a href="#color">Color</a></li>
+        <li><a href="#tipografia">Tipografía</a></li>
+        <li><a href="#shape">Shape</a></li>
+        <li><a href="#elevation">Elevation</a></li>
+        <li><a href="#spacing">Espaciado</a></li>
+        <li><a href="#iconografia">Iconografía</a></li>
+      </ul>
+      <span class="doc-toc__group-title">Componentes</span>
+      <ul class="doc-toc__list">
+        <li><a href="#botones">Botones</a></li>
+        <li><a href="#chips">Chips</a></li>
+        <li><a href="#text-fields">Text fields</a></li>
+        <li><a href="#cards">Cards</a></li>
+        <li><a href="#listas">Listas</a></li>
+        <li><a href="#navegacion">Navegación</a></li>
+        <li><a href="#mas">Más componentes</a></li>
+      </ul>
+      <span class="doc-toc__group-title">Aplicación</span>
+      <ul class="doc-toc__list">
+        <li><a href="#mobile">Mobile</a></li>
+        <li><a href="#desktop">Desktop</a></li>
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- ═══════════════ MAIN ═══════════════ -->
+  <main class="doc-main">
+
+    <!-- ═══ HERO ═══ -->
+    <header class="doc-hero" id="intro">
+      <div class="eyebrow">Sistema de Diseño · v1.0</div>
+      <h1>Gilda Bakery</h1>
+      <p class="lede">
+        Un sistema de diseño cálido y artesanal sobre la base de
+        <strong>Material Design 3</strong>. Pensado para que Gilda pueda llevar
+        sus costos y ganancias por hora — tanto en su PC como en el celular —
+        sin perder el carácter de panadería de barrio.
+      </p>
+      <div class="doc-hero__meta">
+        <span class="md-chip status info">
+          <span class="material-symbols-rounded">palette</span>
+          M3 · Light scheme
+        </span>
+        <span class="md-chip status neutral">
+          <span class="material-symbols-rounded">brush</span>
+          Pacifico + Lato
+        </span>
+        <span class="md-chip status success">
+          <span class="material-symbols-rounded">devices</span>
+          Mobile &amp; desktop
+        </span>
+      </div>
+    </header>
+
+    <!-- ═══ PRINCIPIOS ═══ -->
+    <section class="doc-section" id="principios">
+      <div class="doc-section__header">
+        <span class="doc-section__num">00</span>
+        <h2 class="doc-section__title">Principios</h2>
+        <p class="doc-section__lede">Tres ideas que guían cada decisión visual.</p>
+      </div>
+      <div class="split-3">
+        <article class="principle">
+          <h4>Cálido, no decorado</h4>
+          <p>Los colores tierra y la tipografía Pacifico aportan calidez. Pero la jerarquía manda: ni una curva ni un acento sobra.</p>
+        </article>
+        <article class="principle">
+          <h4>Hecho a mano, leído rápido</h4>
+          <p>Pacifico solo para titulares y nombres de productos. Lato para todo lo funcional. Los números son protagonistas y siempre tabulares.</p>
+        </article>
+        <article class="principle">
+          <h4>Mobile primero, desktop sin esfuerzo</h4>
+          <p>Pensado con navigation bar en mobile y rail en desktop. Las cards crecen, no se duplican; los formularios mantienen su ritmo.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- ═══════════════ COLOR ═══════════════ -->
+    <section class="doc-section" id="color">
+      <div class="doc-section__header">
+        <span class="doc-section__num">01</span>
+        <h2 class="doc-section__title">Color</h2>
+        <p class="doc-section__lede">
+          La paleta de marca se mapea a los <strong>roles semánticos de Material Design 3</strong>.
+          Nunca uses el hex directo en un componente — usá el rol (ej. <span class="pill">--md-sys-color-primary</span>).
+        </p>
+      </div>
+
+      <!-- Paleta principal -->
+      <div class="doc-subsection">
+        <h3>Paleta de marca</h3>
+        <div class="swatch-grid">
+          <div class="swatch"><div class="swatch__color" style="background:#C4673A"></div>
+            <div class="swatch__meta"><div class="swatch__name">Terracota</div>
+              <div class="swatch__hex">#C4673A</div>
+              <code class="swatch__token">--brand-terracota</code></div></div>
+          <div class="swatch"><div class="swatch__color" style="background:#F5E6C8"></div>
+            <div class="swatch__meta"><div class="swatch__name">Mantequilla</div>
+              <div class="swatch__hex">#F5E6C8</div>
+              <code class="swatch__token">--brand-mantequilla</code></div></div>
+          <div class="swatch"><div class="swatch__color" style="background:#3D2314"></div>
+            <div class="swatch__meta"><div class="swatch__name">Chocolate</div>
+              <div class="swatch__hex">#3D2314</div>
+              <code class="swatch__token">--brand-chocolate</code></div></div>
+          <div class="swatch"><div class="swatch__color" style="background:#FBF7F0;border-bottom:1px solid var(--md-sys-color-outline-variant)"></div>
+            <div class="swatch__meta"><div class="swatch__name">Fondo</div>
+              <div class="swatch__hex">#FBF7F0</div>
+              <code class="swatch__token">--brand-fondo</code></div></div>
+          <div class="swatch"><div class="swatch__color" style="background:#7A9E7E"></div>
+            <div class="swatch__meta"><div class="swatch__name">Salvia</div>
+              <div class="swatch__hex">#7A9E7E</div>
+              <code class="swatch__token">--brand-salvia</code></div></div>
+          <div class="swatch"><div class="swatch__color" style="background:#EDE3D3"></div>
+            <div class="swatch__meta"><div class="swatch__name">Muted</div>
+              <div class="swatch__hex">#EDE3D3</div>
+              <code class="swatch__token">--brand-muted</code></div></div>
+          <div class="swatch"><div class="swatch__color" style="background:#8B6B52"></div>
+            <div class="swatch__meta"><div class="swatch__name">Muted FG</div>
+              <div class="swatch__hex">#8B6B52</div>
+              <code class="swatch__token">--brand-muted-fg</code></div></div>
+          <div class="swatch"><div class="swatch__color" style="background:#B83232"></div>
+            <div class="swatch__meta"><div class="swatch__name">Destructivo</div>
+              <div class="swatch__hex">#B83232</div>
+              <code class="swatch__token">--brand-destructivo</code></div></div>
+          <div class="swatch"><div class="swatch__color" style="background:#D4EAD6"></div>
+            <div class="swatch__meta"><div class="swatch__name">Éxito</div>
+              <div class="swatch__hex">#D4EAD6</div>
+              <code class="swatch__token">--brand-exito</code></div></div>
+          <div class="swatch"><div class="swatch__color" style="background:#FFF0D4"></div>
+            <div class="swatch__meta"><div class="swatch__name">Advertencia</div>
+              <div class="swatch__hex">#FFF0D4</div>
+              <code class="swatch__token">--brand-advertencia</code></div></div>
+        </div>
+      </div>
+
+      <!-- Roles M3 -->
+      <div class="doc-subsection">
+        <h3>Roles M3 — pares (color / on-color)</h3>
+        <div class="split-2">
+          <div class="role-pair">
+            <div class="role-pair__main" style="background:#C4673A;color:#fff">
+              <span class="name">primary</span><span class="hex">#C4673A</span>
+            </div>
+            <div class="role-pair__on" style="background:#F5E6C8;color:#3D2314">
+              <span class="name">primary-container</span><span class="hex">#F5E6C8 · on: #3D2314</span>
+            </div>
+          </div>
+          <div class="role-pair">
+            <div class="role-pair__main" style="background:#7A9E7E;color:#fff">
+              <span class="name">secondary</span><span class="hex">#7A9E7E</span>
+            </div>
+            <div class="role-pair__on" style="background:#D4EAD6;color:#1F3A23">
+              <span class="name">secondary-container</span><span class="hex">#D4EAD6 · on: #1F3A23</span>
+            </div>
+          </div>
+          <div class="role-pair">
+            <div class="role-pair__main" style="background:#8B6B52;color:#fff">
+              <span class="name">tertiary</span><span class="hex">#8B6B52</span>
+            </div>
+            <div class="role-pair__on" style="background:#EDE3D3;color:#3D2314">
+              <span class="name">tertiary-container</span><span class="hex">#EDE3D3 · on: #3D2314</span>
+            </div>
+          </div>
+          <div class="role-pair">
+            <div class="role-pair__main" style="background:#B83232;color:#fff">
+              <span class="name">error</span><span class="hex">#B83232</span>
+            </div>
+            <div class="role-pair__on" style="background:#F8D7D7;color:#5C0E0E">
+              <span class="name">error-container</span><span class="hex">#F8D7D7 · on: #5C0E0E</span>
+            </div>
+          </div>
+          <div class="role-pair">
+            <div class="role-pair__main" style="background:#5C7E60;color:#fff">
+              <span class="name">success</span><span class="hex">#5C7E60</span>
+            </div>
+            <div class="role-pair__on" style="background:#D4EAD6;color:#1F3A23">
+              <span class="name">success-container</span><span class="hex">#D4EAD6 · on: #1F3A23</span>
+            </div>
+          </div>
+          <div class="role-pair">
+            <div class="role-pair__main" style="background:#B07A1A;color:#fff">
+              <span class="name">warning</span><span class="hex">#B07A1A</span>
+            </div>
+            <div class="role-pair__on" style="background:#FFF0D4;color:#4A3300">
+              <span class="name">warning-container</span><span class="hex">#FFF0D4 · on: #4A3300</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Surfaces -->
+      <div class="doc-subsection">
+        <h3>Surfaces — capas de elevación tonal</h3>
+        <div class="swatch-grid" style="grid-template-columns:repeat(auto-fill, minmax(180px, 1fr));">
+          <div class="swatch"><div class="swatch__color" style="background:#FFFFFF;border-bottom:1px solid var(--md-sys-color-outline-variant)"></div>
+            <div class="swatch__meta"><div class="swatch__name">surface-container-lowest</div>
+              <div class="swatch__hex">#FFFFFF</div></div></div>
+          <div class="swatch"><div class="swatch__color" style="background:#FBF7F0;border-bottom:1px solid var(--md-sys-color-outline-variant)"></div>
+            <div class="swatch__meta"><div class="swatch__name">surface · background</div>
+              <div class="swatch__hex">#FBF7F0</div></div></div>
+          <div class="swatch"><div class="swatch__color" style="background:#F7F0E2"></div>
+            <div class="swatch__meta"><div class="swatch__name">surface-container-low</div>
+              <div class="swatch__hex">#F7F0E2</div></div></div>
+          <div class="swatch"><div class="swatch__color" style="background:#F2E8D2"></div>
+            <div class="swatch__meta"><div class="swatch__name">surface-container</div>
+              <div class="swatch__hex">#F2E8D2</div></div></div>
+          <div class="swatch"><div class="swatch__color" style="background:#ECDFC0"></div>
+            <div class="swatch__meta"><div class="swatch__name">surface-container-high</div>
+              <div class="swatch__hex">#ECDFC0</div></div></div>
+          <div class="swatch"><div class="swatch__color" style="background:#E5D5AE"></div>
+            <div class="swatch__meta"><div class="swatch__name">surface-container-highest</div>
+              <div class="swatch__hex">#E5D5AE</div></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════ TIPOGRAFÍA ═══════════════ -->
+    <section class="doc-section" id="tipografia">
+      <div class="doc-section__header">
+        <span class="doc-section__num">02</span>
+        <h2 class="doc-section__title">Tipografía</h2>
+        <p class="doc-section__lede">
+          <strong>Pacifico</strong> — solo para display y nombres de productos. Aporta el sello artesanal.<br>
+          <strong>Lato</strong> — todo lo demás: títulos, cuerpo, UI. Pesos 300 / 400 / 700 / 900.
+        </p>
+      </div>
+
+      <div class="doc-subsection">
+        <h3>Display — Pacifico</h3>
+        <div class="type-row">
+          <div class="type-row__meta"><b>display-large</b>57 / 64 · 400</div>
+          <div class="type-row__sample display-large" style="color:var(--md-sys-color-primary)">Pan de masa madre</div>
+        </div>
+        <div class="type-row">
+          <div class="type-row__meta"><b>display-medium</b>45 / 52 · 400</div>
+          <div class="type-row__sample display-medium" style="color:var(--md-sys-color-primary)">Croissant de manteca</div>
+        </div>
+        <div class="type-row">
+          <div class="type-row__meta"><b>display-small</b>36 / 44 · 400</div>
+          <div class="type-row__sample display-small" style="color:var(--md-sys-color-primary)">Torta de zanahoria</div>
+        </div>
+      </div>
+
+      <div class="doc-subsection">
+        <h3>Headline — Lato Black</h3>
+        <div class="type-row">
+          <div class="type-row__meta"><b>headline-large</b>32 / 40 · 900</div>
+          <div class="type-row__sample headline-large">$ 4.250 ganaste hoy</div>
+        </div>
+        <div class="type-row">
+          <div class="type-row__meta"><b>headline-medium</b>28 / 36 · 900</div>
+          <div class="type-row__sample headline-medium">Recetas activas</div>
+        </div>
+        <div class="type-row">
+          <div class="type-row__meta"><b>headline-small</b>24 / 32 · 700</div>
+          <div class="type-row__sample headline-small">Insumos del mes</div>
+        </div>
+      </div>
+
+      <div class="doc-subsection">
+        <h3>Title · Body · Label — Lato</h3>
+        <div class="type-row">
+          <div class="type-row__meta"><b>title-large</b>22 / 28 · 700</div>
+          <div class="type-row__sample title-large">Costo total por tanda</div>
+        </div>
+        <div class="type-row">
+          <div class="type-row__meta"><b>title-medium</b>16 / 24 · 700 · .15</div>
+          <div class="type-row__sample title-medium">Harina 000 — 50 kg</div>
+        </div>
+        <div class="type-row">
+          <div class="type-row__meta"><b>title-small</b>14 / 20 · 700 · .1</div>
+          <div class="type-row__sample title-small">PROVEEDOR PRINCIPAL</div>
+        </div>
+        <div class="type-row">
+          <div class="type-row__meta"><b>body-large</b>16 / 24 · 400 · .5</div>
+          <div class="type-row__sample body-large">Cargá lo que gastás y mirá cuánto ganás por hora trabajada en la cocina.</div>
+        </div>
+        <div class="type-row">
+          <div class="type-row__meta"><b>body-medium</b>14 / 20 · 400 · .25</div>
+          <div class="type-row__sample body-medium">El cálculo incluye costo de insumos, gas y tiempo invertido.</div>
+        </div>
+        <div class="type-row">
+          <div class="type-row__meta"><b>body-small</b>12 / 16 · 400 · .4</div>
+          <div class="type-row__sample body-small">Última actualización hace 3 minutos</div>
+        </div>
+        <div class="type-row">
+          <div class="type-row__meta"><b>label-large</b>14 / 20 · 700 · .1</div>
+          <div class="type-row__sample label-large">AGREGAR INSUMO</div>
+        </div>
+        <div class="type-row">
+          <div class="type-row__meta"><b>label-medium</b>12 / 16 · 700 · .5</div>
+          <div class="type-row__sample label-medium">RECETAS</div>
+        </div>
+        <div class="type-row">
+          <div class="type-row__meta"><b>label-small</b>11 / 16 · 700 · .5</div>
+          <div class="type-row__sample label-small">CATEGORÍA</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════ SHAPE ═══════════════ -->
+    <section class="doc-section" id="shape">
+      <div class="doc-section__header">
+        <span class="doc-section__num">03</span>
+        <h2 class="doc-section__title">Shape</h2>
+        <p class="doc-section__lede">Escala de border-radius de M3. Usá <span class="pill">corner-medium</span> por defecto en cards.</p>
+      </div>
+      <div class="shape-grid">
+        <div class="shape-cell" style="border-radius:var(--md-sys-shape-corner-none)"><b>none</b><span>0px</span></div>
+        <div class="shape-cell" style="border-radius:var(--md-sys-shape-corner-extra-small)"><b>extra-small</b><span>4px</span></div>
+        <div class="shape-cell" style="border-radius:var(--md-sys-shape-corner-small)"><b>small</b><span>8px</span></div>
+        <div class="shape-cell" style="border-radius:var(--md-sys-shape-corner-medium)"><b>medium</b><span>12px</span></div>
+        <div class="shape-cell" style="border-radius:var(--md-sys-shape-corner-large)"><b>large</b><span>16px</span></div>
+        <div class="shape-cell" style="border-radius:var(--md-sys-shape-corner-extra-large)"><b>extra-large</b><span>28px</span></div>
+        <div class="shape-cell" style="border-radius:var(--md-sys-shape-corner-full)"><b>full</b><span>9999px</span></div>
+      </div>
+    </section>
+
+    <!-- ═══════════════ ELEVATION ═══════════════ -->
+    <section class="doc-section" id="elevation">
+      <div class="doc-section__header">
+        <span class="doc-section__num">04</span>
+        <h2 class="doc-section__title">Elevation</h2>
+        <p class="doc-section__lede">6 niveles M3. Sombras tintadas con <span class="pill">--brand-chocolate</span> para que se sientan cálidas.</p>
+      </div>
+      <div class="elev-grid">
+        <div class="elev-cell" style="box-shadow:var(--md-sys-elevation-level0);border:1px dashed var(--md-sys-color-outline-variant)"><b>level 0</b><span>none</span></div>
+        <div class="elev-cell" style="box-shadow:var(--md-sys-elevation-level1)"><b>level 1</b><span>card / chip</span></div>
+        <div class="elev-cell" style="box-shadow:var(--md-sys-elevation-level2)"><b>level 2</b><span>raised</span></div>
+        <div class="elev-cell" style="box-shadow:var(--md-sys-elevation-level3)"><b>level 3</b><span>FAB · snackbar</span></div>
+        <div class="elev-cell" style="box-shadow:var(--md-sys-elevation-level4)"><b>level 4</b><span>nav drawer</span></div>
+        <div class="elev-cell" style="box-shadow:var(--md-sys-elevation-level5)"><b>level 5</b><span>modal</span></div>
+      </div>
+    </section>
+
+    <!-- ═══════════════ SPACING ═══════════════ -->
+    <section class="doc-section" id="spacing">
+      <div class="doc-section__header">
+        <span class="doc-section__num">05</span>
+        <h2 class="doc-section__title">Espaciado</h2>
+        <p class="doc-section__lede">Escala base de 4 px. Las cards usan padding 16 / 24; las pantallas, margen 16 (mobile) / 40 (desktop).</p>
+      </div>
+      <div class="demo">
+        <div class="space-row"><div class="space-row__meta"><b>spacing-1</b>4 px</div><div class="space-row__bar" style="width:4px"></div></div>
+        <div class="space-row"><div class="space-row__meta"><b>spacing-2</b>8 px</div><div class="space-row__bar" style="width:8px"></div></div>
+        <div class="space-row"><div class="space-row__meta"><b>spacing-3</b>12 px</div><div class="space-row__bar" style="width:12px"></div></div>
+        <div class="space-row"><div class="space-row__meta"><b>spacing-4</b>16 px</div><div class="space-row__bar" style="width:16px"></div></div>
+        <div class="space-row"><div class="space-row__meta"><b>spacing-6</b>24 px</div><div class="space-row__bar" style="width:24px"></div></div>
+        <div class="space-row"><div class="space-row__meta"><b>spacing-8</b>32 px</div><div class="space-row__bar" style="width:32px"></div></div>
+        <div class="space-row"><div class="space-row__meta"><b>spacing-12</b>48 px</div><div class="space-row__bar" style="width:48px"></div></div>
+        <div class="space-row"><div class="space-row__meta"><b>spacing-16</b>64 px</div><div class="space-row__bar" style="width:64px"></div></div>
+        <div class="space-row"><div class="space-row__meta"><b>spacing-24</b>96 px</div><div class="space-row__bar" style="width:96px"></div></div>
+      </div>
+    </section>
+
+    <!-- ═══════════════ ICONOGRAFÍA ═══════════════ -->
+    <section class="doc-section" id="iconografia">
+      <div class="doc-section__header">
+        <span class="doc-section__num">06</span>
+        <h2 class="doc-section__title">Iconografía</h2>
+        <p class="doc-section__lede">
+          <strong>Material Symbols Rounded</strong> (variable). Pesos 400 / 500. Filled solo cuando el ítem está activo o seleccionado.
+        </p>
+      </div>
+      <div class="icon-gallery">
+        <div class="icon-cell"><span class="material-symbols-rounded">restaurant_menu</span><span class="name">restaurant_menu</span></div>
+        <div class="icon-cell"><span class="material-symbols-rounded">bakery_dining</span><span class="name">bakery_dining</span></div>
+        <div class="icon-cell"><span class="material-symbols-rounded">cake</span><span class="name">cake</span></div>
+        <div class="icon-cell"><span class="material-symbols-rounded">inventory_2</span><span class="name">inventory_2</span></div>
+        <div class="icon-cell"><span class="material-symbols-rounded">scale</span><span class="name">scale</span></div>
+        <div class="icon-cell"><span class="material-symbols-rounded">payments</span><span class="name">payments</span></div>
+        <div class="icon-cell"><span class="material-symbols-rounded">schedule</span><span class="name">schedule</span></div>
+        <div class="icon-cell"><span class="material-symbols-rounded">trending_up</span><span class="name">trending_up</span></div>
+        <div class="icon-cell"><span class="material-symbols-rounded">add</span><span class="name">add</span></div>
+        <div class="icon-cell"><span class="material-symbols-rounded">edit</span><span class="name">edit</span></div>
+        <div class="icon-cell"><span class="material-symbols-rounded">delete</span><span class="name">delete</span></div>
+        <div class="icon-cell"><span class="material-symbols-rounded">settings</span><span class="name">settings</span></div>
+        <div class="icon-cell"><span class="material-symbols-rounded">search</span><span class="name">search</span></div>
+        <div class="icon-cell"><span class="material-symbols-rounded">filter_list</span><span class="name">filter_list</span></div>
+        <div class="icon-cell"><span class="material-symbols-rounded">check_circle</span><span class="name">check_circle</span></div>
+        <div class="icon-cell"><span class="material-symbols-rounded">warning</span><span class="name">warning</span></div>
+      </div>
+    </section>
+
+    <!-- ═══════════════ BOTONES ═══════════════ -->
+    <section class="doc-section" id="botones">
+      <div class="doc-section__header">
+        <span class="doc-section__num">07</span>
+        <h2 class="doc-section__title">Botones</h2>
+        <p class="doc-section__lede">5 variantes M3 (filled, tonal, outlined, text, elevated) + destructivo. Forma <span class="pill">full</span> en todas.</p>
+      </div>
+
+      <div class="doc-subsection">
+        <h3>Variantes</h3>
+        <div class="demo demo--flex">
+          <button class="md-button filled">Confirmar pedido</button>
+          <button class="md-button tonal">Ver catálogo</button>
+          <button class="md-button outlined">Editar</button>
+          <button class="md-button text">Cancelar</button>
+          <button class="md-button elevated">Imprimir</button>
+          <button class="md-button destructive">Eliminar</button>
+        </div>
+      </div>
+
+      <div class="doc-subsection">
+        <h3>Tamaños</h3>
+        <div class="demo demo--flex">
+          <button class="md-button filled size-sm">Pequeño</button>
+          <button class="md-button filled">Mediano</button>
+          <button class="md-button filled size-lg">Grande</button>
+        </div>
+      </div>
+
+      <div class="doc-subsection">
+        <h3>Con ícono</h3>
+        <div class="demo demo--flex">
+          <button class="md-button filled"><span class="material-symbols-rounded">add</span>Nueva receta</button>
+          <button class="md-button tonal"><span class="material-symbols-rounded">print</span>Imprimir</button>
+          <button class="md-button outlined">Ver pedidos<span class="material-symbols-rounded">arrow_forward</span></button>
+          <button class="md-button text"><span class="material-symbols-rounded">download</span>Exportar</button>
+        </div>
+      </div>
+
+      <div class="doc-subsection">
+        <h3>Estados</h3>
+        <div class="demo demo--flex">
+          <button class="md-button filled" disabled>Deshabilitado</button>
+          <button class="md-button tonal" disabled>Deshabilitado</button>
+          <button class="md-button outlined" disabled>Deshabilitado</button>
+          <button class="md-button filled"><span class="material-symbols-rounded">check</span>Guardado</button>
+        </div>
+      </div>
+
+      <div class="doc-subsection">
+        <h3>Icon button &amp; FAB</h3>
+        <div class="demo demo--flex">
+          <button class="md-icon-button"><span class="material-symbols-rounded">edit</span></button>
+          <button class="md-icon-button tonal"><span class="material-symbols-rounded">favorite</span></button>
+          <button class="md-icon-button filled"><span class="material-symbols-rounded">add</span></button>
+          <button class="md-icon-button outlined"><span class="material-symbols-rounded">delete</span></button>
+          <span style="width:24px"></span>
+          <button class="md-fab"><span class="material-symbols-rounded">add</span></button>
+          <button class="md-fab primary extended"><span class="material-symbols-rounded">add</span>Nueva receta</button>
+          <button class="md-fab tertiary"><span class="material-symbols-rounded">edit</span></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════ CHIPS ═══════════════ -->
+    <section class="doc-section" id="chips">
+      <div class="doc-section__header">
+        <span class="doc-section__num">08</span>
+        <h2 class="doc-section__title">Chips</h2>
+        <p class="doc-section__lede">4 tipos M3 + chips de estado semántico para etiquetar productos e ingredientes.</p>
+      </div>
+
+      <div class="doc-subsection">
+        <h3>Filter chips — selección múltiple</h3>
+        <div class="demo demo--flex">
+          <button class="md-chip">Panadería</button>
+          <button class="md-chip selected"><span class="material-symbols-rounded">check</span>Pastelería</button>
+          <button class="md-chip">Facturas</button>
+          <button class="md-chip">Bebidas</button>
+          <button class="md-chip selected"><span class="material-symbols-rounded">check</span>Sin gluten</button>
+          <button class="md-chip">Vegano</button>
+        </div>
+      </div>
+
+      <div class="doc-subsection">
+        <h3>Input chips — con eliminación</h3>
+        <div class="demo demo--flex">
+          <span class="md-chip input">Sin gluten<span class="close"><span class="material-symbols-rounded" style="font-size:14px">close</span></span></span>
+          <span class="md-chip input">Vegano<span class="close"><span class="material-symbols-rounded" style="font-size:14px">close</span></span></span>
+          <span class="md-chip input">Sin lactosa<span class="close"><span class="material-symbols-rounded" style="font-size:14px">close</span></span></span>
+        </div>
+      </div>
+
+      <div class="doc-subsection">
+        <h3>Suggestion chips</h3>
+        <div class="demo demo--flex">
+          <button class="md-chip suggestion"><span class="material-symbols-rounded">bakery_dining</span>Pan de masa madre</button>
+          <button class="md-chip suggestion"><span class="material-symbols-rounded">restaurant</span>Croissant</button>
+          <button class="md-chip suggestion"><span class="material-symbols-rounded">cake</span>Torta de cumpleaños</button>
+          <button class="md-chip suggestion"><span class="material-symbols-rounded">coffee</span>Medialunas</button>
+        </div>
+      </div>
+
+      <div class="doc-subsection">
+        <h3>Status chips — sin interacción</h3>
+        <div class="demo demo--flex">
+          <span class="md-chip status success"><span class="material-symbols-rounded">check_circle</span>Disponible</span>
+          <span class="md-chip status warning"><span class="material-symbols-rounded">schedule</span>Últimas 3</span>
+          <span class="md-chip status error"><span class="material-symbols-rounded">cancel</span>Sin stock</span>
+          <span class="md-chip status info"><span class="material-symbols-rounded">local_offer</span>Novedad</span>
+          <span class="md-chip status neutral"><span class="material-symbols-rounded">star</span>Más vendido</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════ TEXT FIELDS ═══════════════ -->
+    <section class="doc-section" id="text-fields">
+      <div class="doc-section__header">
+        <span class="doc-section__num">09</span>
+        <h2 class="doc-section__title">Text fields</h2>
+        <p class="doc-section__lede">Filled (default) y outlined. Mismo comportamiento: label flotante, support text, soporte para íconos y prefijos.</p>
+      </div>
+
+      <div class="doc-subsection">
+        <h3>Filled (default)</h3>
+        <div class="demo demo--grid">
+          <div class="md-text-field has-value">
+            <input class="md-text-field__input" id="t1" placeholder=" " value="Pan de masa madre">
+            <label class="md-text-field__label" for="t1">Nombre de la receta</label>
+            <span class="md-text-field__support">Sin acentos ni símbolos</span>
+          </div>
+          <div class="md-text-field with-prefix has-value">
+            <span class="md-text-field__prefix">$</span>
+            <input class="md-text-field__input" id="t2" placeholder=" " value="3.800" inputmode="decimal">
+            <label class="md-text-field__label" for="t2">Precio de venta</label>
+          </div>
+          <div class="md-text-field">
+            <input class="md-text-field__input" id="t3" placeholder=" ">
+            <label class="md-text-field__label" for="t3">Cantidad por tanda</label>
+          </div>
+          <div class="md-text-field error has-value">
+            <input class="md-text-field__input" id="t4" placeholder=" " value="-5">
+            <label class="md-text-field__label" for="t4">Horas trabajadas</label>
+            <span class="md-text-field__support">No puede ser negativo</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="doc-subsection">
+        <h3>Outlined</h3>
+        <div class="demo demo--grid">
+          <div class="md-text-field outlined has-value">
+            <input class="md-text-field__input" id="t5" placeholder=" " value="Molinera del Sur">
+            <label class="md-text-field__label" for="t5">Proveedor</label>
+          </div>
+          <div class="md-text-field outlined">
+            <input class="md-text-field__input" id="t6" placeholder=" ">
+            <label class="md-text-field__label" for="t6">Notas</label>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════ CARDS ═══════════════ -->
+    <section class="doc-section" id="cards">
+      <div class="doc-section__header">
+        <span class="doc-section__num">10</span>
+        <h2 class="doc-section__title">Cards</h2>
+        <p class="doc-section__lede">Las 3 variantes M3 + composiciones específicas de la app (producto, ingrediente, costo por receta).</p>
+      </div>
+
+      <div class="doc-subsection">
+        <h3>Variantes base M3</h3>
+        <div class="demo demo--grid">
+          <div class="md-card elevated">
+            <div class="md-card__header"><h4 class="title-large">Elevated</h4></div>
+            <div class="md-card__body body-medium">Card con elevación level 1. Hover sube a level 2. Usar como default cuando hace falta separación visual.</div>
+          </div>
+          <div class="md-card filled">
+            <div class="md-card__header"><h4 class="title-large">Filled</h4></div>
+            <div class="md-card__body body-medium">Fondo más oscuro que el surface base. Útil para destacar bloques de datos.</div>
+          </div>
+          <div class="md-card outlined">
+            <div class="md-card__header"><h4 class="title-large">Outlined</h4></div>
+            <div class="md-card__body body-medium">Borde 1px, sin sombra. Ideal cuando hay muchas cards juntas y la elevación distrae.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="doc-subsection">
+        <h3>Card de ingrediente — con stock</h3>
+        <div class="demo">
+          <div class="split-3">
+            <div class="stock-card ok">
+              <div class="stock-card__body">
+                <div class="stock-card__top">
+                  <div><div class="stock-card__name">Harina 000</div><div class="stock-card__cat">Harinas</div></div>
+                  <span class="md-chip status success"><span class="material-symbols-rounded">check_circle</span>OK</span>
+                </div>
+                <div class="stock-card__row"><span>Stock actual</span><b>18 / 50 kg</b></div>
+                <div class="md-progress success"><div class="md-progress__bar" style="width:36%"></div></div>
+                <div class="stock-card__row body-small"><span>Mínimo: 10 kg</span><span></span></div>
+                <div class="stock-card__meta">
+                  <div><div class="label">Costo / kg</div><div class="value cost">$850</div></div>
+                  <div><div class="label">Último ingreso</div><div class="value">15 may 2026</div></div>
+                </div>
+                <div class="stock-card__meta" style="grid-template-columns:1fr">
+                  <div><div class="label">Proveedor</div><div class="value">Molinera del Sur</div></div>
+                </div>
+                <button class="md-button outlined" style="width:100%"><span class="material-symbols-rounded">add_circle</span>Actualizar stock</button>
+              </div>
+            </div>
+
+            <div class="stock-card crit">
+              <div class="stock-card__body">
+                <div class="stock-card__top">
+                  <div><div class="stock-card__name">Mantequilla</div><div class="stock-card__cat">Lácteos</div></div>
+                  <span class="md-chip status error"><span class="material-symbols-rounded">warning</span>Crítico</span>
+                </div>
+                <div class="stock-card__row"><span>Stock actual</span><b>3,5 / 20 kg</b></div>
+                <div class="md-progress error"><div class="md-progress__bar" style="width:17%"></div></div>
+                <div class="stock-card__row body-small"><span>Mínimo: 5 kg</span><span></span></div>
+                <div class="stock-card__meta">
+                  <div><div class="label">Costo / kg</div><div class="value cost">$4.200</div></div>
+                  <div><div class="label">Último ingreso</div><div class="value">12 may 2026</div></div>
+                </div>
+                <div class="stock-card__meta" style="grid-template-columns:1fr">
+                  <div><div class="label">Proveedor</div><div class="value">Lácteos Pamperos</div></div>
+                </div>
+                <button class="md-button outlined" style="width:100%"><span class="material-symbols-rounded">add_circle</span>Actualizar stock</button>
+              </div>
+            </div>
+
+            <div class="stock-card warn">
+              <div class="stock-card__body">
+                <div class="stock-card__top">
+                  <div><div class="stock-card__name">Levadura fresca</div><div class="stock-card__cat">Fermentos</div></div>
+                  <span class="md-chip status warning"><span class="material-symbols-rounded">cancel</span>Sin stock</span>
+                </div>
+                <div class="stock-card__row"><span>Stock actual</span><b>0 / 10 kg</b></div>
+                <div class="md-progress warning"><div class="md-progress__bar" style="width:0%"></div></div>
+                <div class="stock-card__row body-small"><span>Mínimo: 2 kg</span><span></span></div>
+                <div class="stock-card__meta">
+                  <div><div class="label">Costo / kg</div><div class="value cost">$1.800</div></div>
+                  <div><div class="label">Último ingreso</div><div class="value">8 may 2026</div></div>
+                </div>
+                <div class="stock-card__meta" style="grid-template-columns:1fr">
+                  <div><div class="label">Proveedor</div><div class="value">Lesaffre Argentina</div></div>
+                </div>
+                <button class="md-button outlined" style="width:100%"><span class="material-symbols-rounded">add_circle</span>Actualizar stock</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="doc-subsection">
+        <h3>Card de costo por receta</h3>
+        <div class="demo">
+          <div class="split-3">
+            <div class="md-card outlined recipe-card">
+              <div class="recipe-card__header">
+                <div>
+                  <div class="label-small" style="color:var(--md-sys-color-on-surface-variant);text-transform:uppercase">Viennoiserie</div>
+                  <div class="recipe-card__title">Croissant de manteca</div>
+                </div>
+                <div style="text-align:right">
+                  <div class="label-small" style="color:var(--md-sys-color-on-surface-variant);text-transform:uppercase">Rinde</div>
+                  <div class="title-large">12 unid</div>
+                </div>
+              </div>
+              <div class="recipe-card__stats">
+                <div class="stat"><div class="stat__label">Costo total</div><div class="stat__value">$1.915</div></div>
+                <div class="stat"><div class="stat__label">Costo / unid</div><div class="stat__value primary">$160</div></div>
+                <div class="stat"><div class="stat__label">Margen</div><div class="stat__value positive">87%</div></div>
+              </div>
+              <button class="md-list-item" style="border-top:1px solid var(--md-sys-color-outline-variant);padding:12px 0 0">
+                <span class="material-symbols-rounded md-list-item__leading">restaurant_menu</span>
+                <span class="md-list-item__content">6 ingredientes</span>
+                <span class="material-symbols-rounded md-list-item__trailing">expand_more</span>
+              </button>
+            </div>
+
+            <div class="md-card outlined recipe-card">
+              <div class="recipe-card__header">
+                <div>
+                  <div class="label-small" style="color:var(--md-sys-color-on-surface-variant);text-transform:uppercase">Panadería</div>
+                  <div class="recipe-card__title">Pan de masa madre</div>
+                </div>
+                <div style="text-align:right">
+                  <div class="label-small" style="color:var(--md-sys-color-on-surface-variant);text-transform:uppercase">Rinde</div>
+                  <div class="title-large">2 pan</div>
+                </div>
+              </div>
+              <div class="recipe-card__stats">
+                <div class="stat"><div class="stat__label">Costo total</div><div class="stat__value">$715</div></div>
+                <div class="stat"><div class="stat__label">Costo / pan</div><div class="stat__value primary">$358</div></div>
+                <div class="stat"><div class="stat__label">Margen</div><div class="stat__value positive">91%</div></div>
+              </div>
+              <button class="md-list-item" style="border-top:1px solid var(--md-sys-color-outline-variant);padding:12px 0 0">
+                <span class="material-symbols-rounded md-list-item__leading">restaurant_menu</span>
+                <span class="md-list-item__content">3 ingredientes</span>
+                <span class="material-symbols-rounded md-list-item__trailing">expand_more</span>
+              </button>
+            </div>
+
+            <div class="md-card outlined recipe-card">
+              <div class="recipe-card__header">
+                <div>
+                  <div class="label-small" style="color:var(--md-sys-color-on-surface-variant);text-transform:uppercase">Pastelería</div>
+                  <div class="recipe-card__title">Torta de zanahoria</div>
+                </div>
+                <div style="text-align:right">
+                  <div class="label-small" style="color:var(--md-sys-color-on-surface-variant);text-transform:uppercase">Rinde</div>
+                  <div class="title-large">10 porc.</div>
+                </div>
+              </div>
+              <div class="recipe-card__stats">
+                <div class="stat"><div class="stat__label">Costo total</div><div class="stat__value">$2.873</div></div>
+                <div class="stat"><div class="stat__label">Costo / porc.</div><div class="stat__value primary">$287</div></div>
+                <div class="stat"><div class="stat__label">Margen</div><div class="stat__value positive">97%</div></div>
+              </div>
+              <button class="md-list-item" style="border-top:1px solid var(--md-sys-color-outline-variant);padding:12px 0 0">
+                <span class="material-symbols-rounded md-list-item__leading">restaurant_menu</span>
+                <span class="md-list-item__content">7 ingredientes</span>
+                <span class="material-symbols-rounded md-list-item__trailing">expand_more</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════ LISTAS ═══════════════ -->
+    <section class="doc-section" id="listas">
+      <div class="doc-section__header">
+        <span class="doc-section__num">11</span>
+        <h2 class="doc-section__title">Listas</h2>
+        <p class="doc-section__lede">List items M3 con leading/trailing icon y soporte para línea secundaria.</p>
+      </div>
+      <div class="demo demo--dense" style="padding:0">
+        <ul class="md-list" style="padding:8px 0;list-style:none;margin:0">
+          <li class="md-list-item">
+            <span class="material-symbols-rounded md-list-item__leading">bakery_dining</span>
+            <div class="md-list-item__content">
+              <div class="md-list-item__headline">Pan de masa madre</div>
+              <div class="md-list-item__supporting">Rinde 2 panes · costo $358 / pan</div>
+            </div>
+            <span class="md-chip status success" style="margin-right:8px">$910/h</span>
+            <span class="material-symbols-rounded md-list-item__trailing">chevron_right</span>
+          </li>
+          <hr class="md-divider">
+          <li class="md-list-item">
+            <span class="material-symbols-rounded md-list-item__leading">restaurant</span>
+            <div class="md-list-item__content">
+              <div class="md-list-item__headline">Croissant de manteca</div>
+              <div class="md-list-item__supporting">Rinde 12 unidades · costo $160 / unid</div>
+            </div>
+            <span class="md-chip status info" style="margin-right:8px">$1.240/h</span>
+            <span class="material-symbols-rounded md-list-item__trailing">chevron_right</span>
+          </li>
+          <hr class="md-divider">
+          <li class="md-list-item">
+            <span class="material-symbols-rounded md-list-item__leading">cake</span>
+            <div class="md-list-item__content">
+              <div class="md-list-item__headline">Torta de zanahoria</div>
+              <div class="md-list-item__supporting">Rinde 10 porciones · costo $287 / porc.</div>
+            </div>
+            <span class="md-chip status warning" style="margin-right:8px">$680/h</span>
+            <span class="material-symbols-rounded md-list-item__trailing">chevron_right</span>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ═══════════════ NAVEGACIÓN ═══════════════ -->
+    <section class="doc-section" id="navegacion">
+      <div class="doc-section__header">
+        <span class="doc-section__num">12</span>
+        <h2 class="doc-section__title">Navegación</h2>
+        <p class="doc-section__lede">
+          Mobile: <strong>navigation bar</strong> abajo. Desktop: <strong>navigation rail</strong> al costado.
+          La app usa los mismos íconos en ambas, con indicator pill.
+        </p>
+      </div>
+
+      <div class="doc-subsection">
+        <h3>Top app bar</h3>
+        <div class="demo demo--dense" style="padding:0;overflow:hidden">
+          <header class="md-top-app-bar">
+            <button class="md-icon-button"><span class="material-symbols-rounded">arrow_back</span></button>
+            <h1 class="md-top-app-bar__title">Recetas</h1>
+            <button class="md-icon-button"><span class="material-symbols-rounded">search</span></button>
+            <button class="md-icon-button"><span class="material-symbols-rounded">more_vert</span></button>
+          </header>
+        </div>
+        <div class="demo demo--dense" style="padding:0;overflow:hidden;margin-top:8px">
+          <header class="md-top-app-bar large">
+            <div style="padding:0 16px"><h1 class="md-top-app-bar__title" style="padding:0">Mis recetas</h1></div>
+          </header>
+        </div>
+      </div>
+
+      <div class="doc-subsection">
+        <h3>Navigation bar (mobile)</h3>
+        <div class="demo demo--dense" style="padding:0">
+          <nav class="md-nav-bar">
+            <button class="md-nav-bar__item active">
+              <span class="md-nav-bar__indicator"><span class="material-symbols-rounded">restaurant_menu</span></span>
+              Recetas
+            </button>
+            <button class="md-nav-bar__item">
+              <span class="md-nav-bar__indicator"><span class="material-symbols-rounded">inventory_2</span></span>
+              Insumos
+            </button>
+            <button class="md-nav-bar__item">
+              <span class="md-nav-bar__indicator"><span class="material-symbols-rounded">trending_up</span></span>
+              Ganancias
+            </button>
+            <button class="md-nav-bar__item">
+              <span class="md-nav-bar__indicator"><span class="material-symbols-rounded">settings</span></span>
+              Ajustes
+            </button>
+          </nav>
+        </div>
+      </div>
+
+      <div class="doc-subsection">
+        <h3>Navigation rail (desktop)</h3>
+        <div class="demo demo--dense" style="padding:0;display:flex;align-items:stretch;min-height:340px">
+          <nav class="md-nav-rail">
+            <button class="md-fab" style="margin-bottom:12px"><span class="material-symbols-rounded">add</span></button>
+            <button class="md-nav-rail__item active">
+              <span class="md-nav-bar__indicator"><span class="material-symbols-rounded">restaurant_menu</span></span>
+              Recetas
+            </button>
+            <button class="md-nav-rail__item">
+              <span class="md-nav-bar__indicator"><span class="material-symbols-rounded">inventory_2</span></span>
+              Insumos
+            </button>
+            <button class="md-nav-rail__item">
+              <span class="md-nav-bar__indicator"><span class="material-symbols-rounded">trending_up</span></span>
+              Ganancias
+            </button>
+            <button class="md-nav-rail__item">
+              <span class="md-nav-bar__indicator"><span class="material-symbols-rounded">settings</span></span>
+              Ajustes
+            </button>
+          </nav>
+          <div style="flex:1;padding:24px;background:var(--md-sys-color-background)">
+            <h4 class="headline-small" style="margin:0 0 12px">Contenido principal</h4>
+            <p class="body-medium" style="color:var(--md-sys-color-on-surface-variant);margin:0">El navigation rail se mantiene fijo a la izquierda y la columna de contenido fluye al lado.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="doc-subsection">
+        <h3>Segmented buttons</h3>
+        <div class="demo demo--flex">
+          <div class="md-segmented">
+            <button class="md-segmented__item selected"><span class="material-symbols-rounded">view_list</span>Lista</button>
+            <button class="md-segmented__item"><span class="material-symbols-rounded">grid_view</span>Cuadrícula</button>
+          </div>
+          <div class="md-segmented">
+            <button class="md-segmented__item selected">Semana</button>
+            <button class="md-segmented__item">Mes</button>
+            <button class="md-segmented__item">Año</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════ MÁS ═══════════════ -->
+    <section class="doc-section" id="mas">
+      <div class="doc-section__header">
+        <span class="doc-section__num">13</span>
+        <h2 class="doc-section__title">Más componentes</h2>
+        <p class="doc-section__lede">Switch, checkbox, progress, snackbar, dialog, badge.</p>
+      </div>
+
+      <div class="doc-subsection">
+        <h3>Switch &amp; checkbox</h3>
+        <div class="demo demo--flex">
+          <label class="md-switch"><input type="checkbox" checked><span class="md-switch__track"><span class="md-switch__thumb"></span></span></label>
+          <label class="md-switch"><input type="checkbox"><span class="md-switch__track"><span class="md-switch__thumb"></span></span></label>
+          <span style="width:24px"></span>
+          <label class="md-checkbox"><input type="checkbox" checked><span class="md-checkbox__box"><span class="material-symbols-rounded">check</span></span>Incluir gas</label>
+          <label class="md-checkbox"><input type="checkbox"><span class="md-checkbox__box"><span class="material-symbols-rounded">check</span></span>Notificarme al cambiar</label>
+        </div>
+      </div>
+
+      <div class="doc-subsection">
+        <h3>Progress</h3>
+        <div class="demo">
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div class="md-progress success"><div class="md-progress__bar" style="width:72%"></div></div>
+            <div class="md-progress warning"><div class="md-progress__bar" style="width:38%"></div></div>
+            <div class="md-progress error"><div class="md-progress__bar" style="width:12%"></div></div>
+            <div class="md-progress"><div class="md-progress__bar" style="width:54%"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="doc-subsection">
+        <h3>Snackbar</h3>
+        <div class="demo demo--center" style="background:var(--md-sys-color-background)">
+          <div class="md-snackbar">
+            Insumo guardado · Mantequilla
+            <button class="md-snackbar__action">Deshacer</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="doc-subsection">
+        <h3>Dialog</h3>
+        <div class="demo demo--center" style="background:var(--md-sys-color-scrim)">
+          <div class="md-dialog">
+            <div class="md-dialog__icon"><span class="material-symbols-rounded" style="font-size:36px">delete</span></div>
+            <h4 class="md-dialog__headline">¿Borrar receta?</h4>
+            <p class="md-dialog__body">"Pan de masa madre" se quitará de tu lista. Los insumos cargados se mantienen.</p>
+            <div class="md-dialog__actions">
+              <button class="md-button text">Cancelar</button>
+              <button class="md-button filled destructive">Borrar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════ APP MOBILE ═══════════════ -->
+    <section class="doc-section" id="mobile">
+      <div class="doc-section__header">
+        <span class="doc-section__num">14</span>
+        <h2 class="doc-section__title">Aplicación · Mobile</h2>
+        <p class="doc-section__lede">Cómo se ven las pantallas reales de la app de Gilda — la calculadora de costos e ingreso por hora.</p>
+      </div>
+
+      <div class="preview-row cols-3">
+
+        <!-- Mobile screen 1: Recetas list -->
+        <div>
+          <div class="phone">
+            <div class="phone__notch">9:41</div>
+            <div class="phone__screen">
+              <div class="app">
+                <header class="md-top-app-bar large" style="height:96px;padding:0 8px 12px">
+                  <div style="padding:0 12px"><h1 class="md-top-app-bar__title" style="padding:0">Mis recetas</h1></div>
+                </header>
+                <div class="app__content app__content--tight">
+                  <div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:4px">
+                    <button class="md-chip selected"><span class="material-symbols-rounded">check</span>Todas</button>
+                    <button class="md-chip">Panadería</button>
+                    <button class="md-chip">Pastelería</button>
+                    <button class="md-chip">Viennoiserie</button>
+                  </div>
+
+                  <ul class="md-list" style="background:var(--md-sys-color-surface-container-low);border-radius:var(--md-sys-shape-corner-medium);padding:8px 0;list-style:none;margin:0">
+                    <li class="md-list-item">
+                      <span class="material-symbols-rounded md-list-item__leading">bakery_dining</span>
+                      <div class="md-list-item__content">
+                        <div class="md-list-item__headline">Pan de masa madre</div>
+                        <div class="md-list-item__supporting">$358 / pan</div>
+                      </div>
+                      <span class="md-chip status success" style="height:24px;font-size:11px;padding:0 8px">$910/h</span>
+                    </li>
+                    <hr class="md-divider">
+                    <li class="md-list-item">
+                      <span class="material-symbols-rounded md-list-item__leading">restaurant</span>
+                      <div class="md-list-item__content">
+                        <div class="md-list-item__headline">Croissant</div>
+                        <div class="md-list-item__supporting">$160 / unid</div>
+                      </div>
+                      <span class="md-chip status info" style="height:24px;font-size:11px;padding:0 8px">$1.240/h</span>
+                    </li>
+                    <hr class="md-divider">
+                    <li class="md-list-item">
+                      <span class="material-symbols-rounded md-list-item__leading">cake</span>
+                      <div class="md-list-item__content">
+                        <div class="md-list-item__headline">Torta de zanahoria</div>
+                        <div class="md-list-item__supporting">$287 / porc.</div>
+                      </div>
+                      <span class="md-chip status warning" style="height:24px;font-size:11px;padding:0 8px">$680/h</span>
+                    </li>
+                  </ul>
+
+                  <div style="position:relative;height:8px"></div>
+                  <button class="md-fab primary extended" style="position:absolute;bottom:96px;right:16px"><span class="material-symbols-rounded">add</span>Receta</button>
+                </div>
+                <nav class="md-nav-bar" style="height:72px;padding:8px 0;flex-shrink:0">
+                  <button class="md-nav-bar__item active"><span class="md-nav-bar__indicator"><span class="material-symbols-rounded">restaurant_menu</span></span>Recetas</button>
+                  <button class="md-nav-bar__item"><span class="md-nav-bar__indicator"><span class="material-symbols-rounded">inventory_2</span></span>Insumos</button>
+                  <button class="md-nav-bar__item"><span class="md-nav-bar__indicator"><span class="material-symbols-rounded">trending_up</span></span>Ganancias</button>
+                  <button class="md-nav-bar__item"><span class="md-nav-bar__indicator"><span class="material-symbols-rounded">settings</span></span>Ajustes</button>
+                </nav>
+              </div>
+            </div>
+          </div>
+          <div class="phone-caption">Lista de recetas</div>
+        </div>
+
+        <!-- Mobile screen 2: Receta detail -->
+        <div>
+          <div class="phone">
+            <div class="phone__notch">9:41</div>
+            <div class="phone__screen">
+              <div class="app">
+                <header class="md-top-app-bar" style="padding:0 4px">
+                  <button class="md-icon-button"><span class="material-symbols-rounded">arrow_back</span></button>
+                  <h1 class="md-top-app-bar__title" style="font-size:16px">Receta</h1>
+                  <button class="md-icon-button"><span class="material-symbols-rounded">edit</span></button>
+                </header>
+                <div class="app__content">
+                  <div>
+                    <div class="label-small" style="color:var(--md-sys-color-on-surface-variant);text-transform:uppercase">Panadería</div>
+                    <div class="display-small" style="color:var(--md-sys-color-primary);line-height:1">Pan de<br>masa madre</div>
+                    <div class="body-medium" style="color:var(--md-sys-color-on-surface-variant);margin-top:4px">Rinde 2 panes · 18 hs de proceso</div>
+                  </div>
+
+                  <div class="md-card filled">
+                    <div class="md-card__body" style="padding:16px">
+                      <div class="recipe-card__stats" style="background:transparent;padding:0">
+                        <div class="stat"><div class="stat__label">Costo total</div><div class="stat__value">$715</div></div>
+                        <div class="stat"><div class="stat__label">Costo / pan</div><div class="stat__value primary">$358</div></div>
+                        <div class="stat"><div class="stat__label">Margen</div><div class="stat__value positive">91%</div></div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div class="title-medium" style="margin-bottom:8px">Ingredientes</div>
+                    <div style="display:flex;flex-direction:column;gap:6px">
+                      <div class="ingredient-row">
+                        <div><div class="ingredient-row__name">Harina 000</div><div class="ingredient-row__sub">500 g · $850/kg</div></div>
+                        <div class="ingredient-row__cost">$425</div>
+                      </div>
+                      <div class="ingredient-row">
+                        <div><div class="ingredient-row__name">Agua</div><div class="ingredient-row__sub">350 ml</div></div>
+                        <div class="ingredient-row__cost">$0</div>
+                      </div>
+                      <div class="ingredient-row">
+                        <div><div class="ingredient-row__name">Sal</div><div class="ingredient-row__sub">10 g · $1.200/kg</div></div>
+                        <div class="ingredient-row__cost">$12</div>
+                      </div>
+                      <div class="ingredient-row">
+                        <div><div class="ingredient-row__name">Masa madre activa</div><div class="ingredient-row__sub">120 g</div></div>
+                        <div class="ingredient-row__cost">$78</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div style="display:flex;gap:8px">
+                    <button class="md-button filled" style="flex:1"><span class="material-symbols-rounded">play_arrow</span>Cocinar</button>
+                    <button class="md-button outlined"><span class="material-symbols-rounded">share</span></button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="phone-caption">Detalle de receta</div>
+        </div>
+
+        <!-- Mobile screen 3: Ganancias / Ingreso por hora -->
+        <div>
+          <div class="phone">
+            <div class="phone__notch">9:41</div>
+            <div class="phone__screen">
+              <div class="app">
+                <header class="md-top-app-bar large" style="height:96px;padding:0 8px 12px">
+                  <div style="padding:0 12px"><h1 class="md-top-app-bar__title" style="padding:0">Mayo 2026</h1></div>
+                </header>
+                <div class="app__content">
+                  <div class="hero-result">
+                    <div class="hero-result__label">Ingreso por hora</div>
+                    <div class="hero-result__big">$1.040</div>
+                    <div class="hero-result__msg">+18% vs abril</div>
+                  </div>
+
+                  <div class="md-card filled">
+                    <div class="md-card__body" style="padding:16px;display:flex;flex-direction:column;gap:12px">
+                      <div class="title-medium">Este mes</div>
+                      <div style="display:flex;justify-content:space-between"><span class="body-medium" style="color:var(--md-sys-color-on-surface-variant)">Horas trabajadas</span><span class="title-medium">82 hs</span></div>
+                      <div style="display:flex;justify-content:space-between"><span class="body-medium" style="color:var(--md-sys-color-on-surface-variant)">Productos cocinados</span><span class="title-medium">214</span></div>
+                      <div style="display:flex;justify-content:space-between"><span class="body-medium" style="color:var(--md-sys-color-on-surface-variant)">Ingresos por ventas</span><span class="title-medium">$184.500</span></div>
+                      <div style="display:flex;justify-content:space-between"><span class="body-medium" style="color:var(--md-sys-color-on-surface-variant)">Costo de insumos</span><span class="title-medium">$98.200</span></div>
+                      <hr class="md-divider" style="margin:4px 0">
+                      <div style="display:flex;justify-content:space-between;align-items:baseline">
+                        <span class="title-large" style="color:var(--md-sys-color-primary)">Ganancia neta</span>
+                        <span class="headline-small" style="color:var(--md-sys-color-primary)">$85.300</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <button class="md-button tonal" style="width:100%"><span class="material-symbols-rounded">edit_calendar</span>Cargar horas del mes</button>
+                </div>
+                <nav class="md-nav-bar" style="height:72px;padding:8px 0;flex-shrink:0">
+                  <button class="md-nav-bar__item"><span class="md-nav-bar__indicator"><span class="material-symbols-rounded">restaurant_menu</span></span>Recetas</button>
+                  <button class="md-nav-bar__item"><span class="md-nav-bar__indicator"><span class="material-symbols-rounded">inventory_2</span></span>Insumos</button>
+                  <button class="md-nav-bar__item active"><span class="md-nav-bar__indicator"><span class="material-symbols-rounded">trending_up</span></span>Ganancias</button>
+                  <button class="md-nav-bar__item"><span class="md-nav-bar__indicator"><span class="material-symbols-rounded">settings</span></span>Ajustes</button>
+                </nav>
+              </div>
+            </div>
+          </div>
+          <div class="phone-caption">Ingreso por hora</div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ═══════════════ APP DESKTOP ═══════════════ -->
+    <section class="doc-section" id="desktop">
+      <div class="doc-section__header">
+        <span class="doc-section__num">15</span>
+        <h2 class="doc-section__title">Aplicación · Desktop</h2>
+        <p class="doc-section__lede">El mismo sistema con navigation rail al costado y layout de 2 columnas. Las cards crecen en lugar de duplicarse.</p>
+      </div>
+
+      <div class="desktop-frame">
+        <div class="desktop-frame__bar">
+          <span class="desktop-frame__dot"></span>
+          <span class="desktop-frame__dot"></span>
+          <span class="desktop-frame__dot"></span>
+        </div>
+        <div class="desktop-frame__body">
+          <nav class="md-nav-rail">
+            <button class="md-fab" style="margin-bottom:12px"><span class="material-symbols-rounded">add</span></button>
+            <button class="md-nav-rail__item active"><span class="md-nav-bar__indicator"><span class="material-symbols-rounded">restaurant_menu</span></span>Recetas</button>
+            <button class="md-nav-rail__item"><span class="md-nav-bar__indicator"><span class="material-symbols-rounded">inventory_2</span></span>Insumos</button>
+            <button class="md-nav-rail__item"><span class="md-nav-bar__indicator"><span class="material-symbols-rounded">trending_up</span></span>Ganancias</button>
+            <button class="md-nav-rail__item"><span class="md-nav-bar__indicator"><span class="material-symbols-rounded">settings</span></span>Ajustes</button>
+          </nav>
+          <div style="flex:1;padding:32px;display:flex;flex-direction:column;gap:24px;background:var(--md-sys-color-background);min-width:0">
+            <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap">
+              <div>
+                <div class="label-small" style="color:var(--md-sys-color-on-surface-variant);text-transform:uppercase">Sección</div>
+                <h1 class="display-small" style="color:var(--md-sys-color-primary)">Mis recetas</h1>
+              </div>
+              <div style="display:flex;gap:8px">
+                <div class="md-segmented">
+                  <button class="md-segmented__item selected"><span class="material-symbols-rounded">view_list</span>Lista</button>
+                  <button class="md-segmented__item"><span class="material-symbols-rounded">grid_view</span>Cuadrícula</button>
+                </div>
+                <button class="md-button filled"><span class="material-symbols-rounded">add</span>Nueva receta</button>
+              </div>
+            </div>
+
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <button class="md-chip selected"><span class="material-symbols-rounded">check</span>Todas</button>
+              <button class="md-chip">Panadería</button>
+              <button class="md-chip">Pastelería</button>
+              <button class="md-chip">Viennoiserie</button>
+              <button class="md-chip">Sin gluten</button>
+            </div>
+
+            <div class="split-3">
+              <div class="md-card outlined recipe-card">
+                <div class="recipe-card__header">
+                  <div>
+                    <div class="label-small" style="color:var(--md-sys-color-on-surface-variant);text-transform:uppercase">Viennoiserie</div>
+                    <div class="recipe-card__title" style="font-size:24px">Croissant de manteca</div>
+                  </div>
+                </div>
+                <div class="recipe-card__stats">
+                  <div class="stat"><div class="stat__label">Costo total</div><div class="stat__value">$1.915</div></div>
+                  <div class="stat"><div class="stat__label">Costo / unid</div><div class="stat__value primary">$160</div></div>
+                  <div class="stat"><div class="stat__label">Margen</div><div class="stat__value positive">87%</div></div>
+                </div>
+                <span class="md-chip status success" style="align-self:flex-start">$1.240/h</span>
+              </div>
+
+              <div class="md-card outlined recipe-card">
+                <div class="recipe-card__header">
+                  <div>
+                    <div class="label-small" style="color:var(--md-sys-color-on-surface-variant);text-transform:uppercase">Panadería</div>
+                    <div class="recipe-card__title" style="font-size:24px">Pan de masa madre</div>
+                  </div>
+                </div>
+                <div class="recipe-card__stats">
+                  <div class="stat"><div class="stat__label">Costo total</div><div class="stat__value">$715</div></div>
+                  <div class="stat"><div class="stat__label">Costo / pan</div><div class="stat__value primary">$358</div></div>
+                  <div class="stat"><div class="stat__label">Margen</div><div class="stat__value positive">91%</div></div>
+                </div>
+                <span class="md-chip status info" style="align-self:flex-start">$910/h</span>
+              </div>
+
+              <div class="md-card outlined recipe-card">
+                <div class="recipe-card__header">
+                  <div>
+                    <div class="label-small" style="color:var(--md-sys-color-on-surface-variant);text-transform:uppercase">Pastelería</div>
+                    <div class="recipe-card__title" style="font-size:24px">Torta de zanahoria</div>
+                  </div>
+                </div>
+                <div class="recipe-card__stats">
+                  <div class="stat"><div class="stat__label">Costo total</div><div class="stat__value">$2.873</div></div>
+                  <div class="stat"><div class="stat__label">Costo / porc.</div><div class="stat__value primary">$287</div></div>
+                  <div class="stat"><div class="stat__label">Margen</div><div class="stat__value positive">97%</div></div>
+                </div>
+                <span class="md-chip status warning" style="align-self:flex-start">$680/h</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════ HANDOFF ═══════════════ -->
+    <section class="doc-section" id="handoff">
+      <div class="doc-section__header">
+        <span class="doc-section__num">∞</span>
+        <h2 class="doc-section__title">Handoff a Claude Code</h2>
+        <p class="doc-section__lede">Lo que tenés que copiar para empezar a desarrollar la app.</p>
+      </div>
+      <div class="split-2">
+        <div class="md-card outlined">
+          <div class="md-card__body">
+            <div class="title-large" style="margin-bottom:8px">📁 Archivos</div>
+            <ul class="body-medium" style="color:var(--md-sys-color-on-surface-variant);padding-left:20px;margin:0">
+              <li><span class="pill">tokens.css</span> — variables M3 + paleta</li>
+              <li><span class="pill">components.css</span> — clases <span class="pill">.md-*</span></li>
+            </ul>
+            <p class="body-medium" style="margin-top:12px;color:var(--md-sys-color-on-surface)">
+              Importá <strong>tokens.css antes</strong> que components.css.
+            </p>
+          </div>
+        </div>
+        <div class="md-card outlined">
+          <div class="md-card__body">
+            <div class="title-large" style="margin-bottom:8px">🎨 Convenciones</div>
+            <ul class="body-medium" style="color:var(--md-sys-color-on-surface-variant);padding-left:20px;margin:0">
+              <li>Nunca uses brand hex en componentes — usá roles M3.</li>
+              <li>Mobile-first. Rail aparece en ≥1024px.</li>
+              <li>Pacifico solo para display + nombres de productos.</li>
+              <li>Material Symbols Rounded, weight 400 / 500.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<style>html { scroll-behavior: smooth; }</style>
+</body>
+</html>
