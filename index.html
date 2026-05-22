@@ -73,12 +73,7 @@
 
   /* ── Listas (recetas / insumos) ────────────────────────────────────────── */
   .stack { display: flex; flex-direction: column; gap: 10px; }
-  .add-bar {
-    position: sticky; top: 0; z-index: 5;
-    background: var(--md-sys-color-background);
-    padding: 10px 0;
-    margin: -10px 0 12px;
-  }
+  .add-bar { margin: 0 0 14px; }
   .add-bar .md-button { width: 100%; }
   @media (min-width: 600px) {
     .add-bar { display: flex; justify-content: flex-end; }
@@ -274,6 +269,43 @@
   }
   .pedido-tbl__wa:hover { filter: brightness(0.92); }
   .pedido-tbl__wa svg { display: block; }
+
+  /* ── Pedido list card ──────────────────────────────────────────────────── */
+  .pedidos-cards-wrap { display: flex; flex-direction: column; gap: 10px; }
+  .pedido-list-card {
+    display: flex; flex-direction: column; gap: 10px;
+    width: 100%; padding: 14px 16px;
+    background: var(--md-sys-color-surface-container-low);
+    border: 1px solid var(--md-sys-color-outline-variant);
+    border-radius: var(--md-sys-shape-corner-medium);
+    cursor: pointer;
+    transition: background-color var(--md-sys-motion-duration-short3),
+                box-shadow var(--md-sys-motion-duration-short3);
+    -webkit-tap-highlight-color: transparent;
+  }
+  .pedido-list-card:hover { background: var(--md-sys-color-surface-container); box-shadow: var(--md-sys-elevation-level1); }
+  .pedido-list-card__top {
+    display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
+  }
+  .pedido-list-card__cliente {
+    font-family: var(--md-sys-typescale-title-font);
+    font-size: 16px; font-weight: 700;
+    color: var(--md-sys-color-on-surface);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    flex: 1; min-width: 0;
+  }
+  .pedido-list-card__fecha {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 600;
+    color: var(--md-sys-color-on-surface-variant);
+  }
+  .pedido-list-card__fecha .material-symbols-rounded { font-size: 18px; }
+  .pedido-list-card__chips {
+    display: flex; flex-wrap: wrap; gap: 6px;
+  }
+  .pedido-list-card__items {
+    font-size: 13px; color: var(--md-sys-color-on-surface);
+  }
   .pedido-card__items {
     margin: 0; padding-left: 20px;
     font-size: 13px; color: var(--md-sys-color-on-surface);
@@ -590,6 +622,153 @@
     min-height: 20px;
   }
   .app[hidden] { display: none; }
+
+  /* ── Vista Próximos ─────────────────────────────────────────────────────── */
+  .dia-title {
+    font-family: var(--md-sys-typescale-headline-font);
+    font-size: 24px; font-weight: 700;
+    color: var(--md-sys-color-primary);
+    margin: 6px 0 12px;
+  }
+  .dia-title__sub {
+    font-size: 14px; font-weight: 600;
+    color: var(--md-sys-color-on-surface-variant);
+  }
+  .dia-separator { height: 8px; }
+  .vencidos-card {
+    border-color: var(--md-sys-color-error);
+    background: var(--md-sys-color-error-container);
+  }
+  .vencidos-card .hoy-section { color: var(--md-sys-color-on-error-container); }
+  .hoy-card { padding: 16px 16px; margin-bottom: 12px; }
+  .hoy-section {
+    font-size: 15px; font-weight: 700;
+    margin: 0 0 10px;
+    color: var(--md-sys-color-on-surface);
+  }
+  .hoy-prod {
+    margin: 0; padding-left: 20px;
+    font-size: 15px; color: var(--md-sys-color-on-surface);
+  }
+  .hoy-prod li { margin: 6px 0; }
+  .hoy-prod b { font-size: 18px; color: var(--md-sys-color-primary); }
+  .hoy-empty-msg {
+    font-size: 14px; color: var(--md-sys-color-on-surface-variant);
+    margin: 0;
+  }
+
+  /* ── Vista Más: ítems de configuración ─────────────────────────────────── */
+  .mas-intro {
+    font-size: 14px; color: var(--md-sys-color-on-surface-variant);
+    margin: 4px 0 12px;
+  }
+  .item-card .mas-icon {
+    font-size: 28px;
+    color: var(--md-sys-color-primary);
+    flex-shrink: 0;
+  }
+  .item-card .chev {
+    color: var(--md-sys-color-on-surface-variant);
+    flex-shrink: 0;
+    font-size: 22px;
+  }
+
+  /* ── Header de sección (botón Volver + título) ─────────────────────────── */
+  .seccion-header {
+    display: flex; align-items: center; gap: 10px;
+    margin: 0 0 14px;
+  }
+  .seccion-title {
+    margin: 0;
+    font-family: var(--md-sys-typescale-headline-font);
+    font-size: 22px; font-weight: 700;
+    color: var(--md-sys-color-primary);
+  }
+  .seccion-title--solo { margin: 6px 0 14px; }
+  .back-mas {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 8px 14px 8px 8px;
+    background: transparent; border: none;
+    color: var(--md-sys-color-primary);
+    font-family: var(--md-sys-typescale-label-font);
+    font-size: 14px; font-weight: 700;
+    cursor: pointer;
+    border-radius: var(--md-sys-shape-corner-medium);
+    flex-shrink: 0;
+  }
+  .back-mas:hover { background: var(--md-sys-color-surface-container); }
+  .back-mas .material-symbols-rounded { font-size: 20px; }
+
+  /* ── Pedido card refinada (urgencia, total, botón estado) ──────────────── */
+  .pedido-list-card {
+    border-left-width: 4px;
+  }
+  .pedido-list-card--urgente {
+    border-left-color: var(--md-sys-color-warning, #ff9800);
+  }
+  .pedido-list-card--vencido {
+    border-left-color: var(--md-sys-color-error);
+    background: var(--md-sys-color-error-container);
+  }
+  .pedido-list-card__total {
+    font-family: var(--md-sys-typescale-title-font);
+    font-size: 17px; font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--md-sys-color-primary);
+    flex-shrink: 0;
+  }
+  .pedido-list-card__row {
+    display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+  }
+
+  /* ── Pill botón unificado (estado + pago tappables) ────────────────────── */
+  .pill-btn {
+    height: 32px;
+    padding: 0 14px;
+    border: none; border-radius: 999px;
+    font-family: var(--md-sys-typescale-label-font);
+    font-size: 13px; font-weight: 700;
+    cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+    transition: filter var(--md-sys-motion-duration-short3);
+    -webkit-tap-highlight-color: transparent;
+  }
+  .pill-btn:hover { filter: brightness(0.92); }
+  .pill-btn.neutral {
+    background: var(--md-sys-color-surface-container-highest);
+    color: var(--md-sys-color-on-surface);
+  }
+  .pill-btn.success {
+    background: var(--md-sys-color-success-container, #c8e6c9);
+    color: var(--md-sys-color-on-success-container, #1b5e20);
+  }
+  .pill-btn.error {
+    background: var(--md-sys-color-error-container);
+    color: var(--md-sys-color-on-error-container);
+  }
+
+  /* ── Toast con botón Deshacer ──────────────────────────────────────────── */
+  .md-snackbar.toast {
+    display: flex; align-items: center; gap: 12px;
+  }
+  .toast-undo {
+    background: transparent; border: none;
+    color: var(--md-sys-color-inverse-primary, #80cbc4);
+    font-family: var(--md-sys-typescale-label-font);
+    font-weight: 700; font-size: 14px;
+    text-transform: uppercase; letter-spacing: 0.6px;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: var(--md-sys-shape-corner-small);
+  }
+  .toast-undo:hover { background: rgba(255,255,255,0.1); }
+
+  /* ── Mejoras de legibilidad (60+) ───────────────────────────────────────── */
+  .item-card__name { font-size: 17px; }
+  .item-card__sub { font-size: 14px; }
+  .hint { font-size: 13px; }
+  .pedido-list-card__cliente { font-size: 17px; }
+  .pedido-list-card__items { font-size: 14px; }
 </style>
 </head>
 <body>
@@ -624,13 +803,9 @@
   <!-- Navigation rail (desktop ≥1024px) -->
   <nav class="md-nav-rail" aria-label="Navegación principal">
     <div class="rail-brand">G</div>
-    <button class="md-nav-rail__item nav-item active" data-vista="recetas" type="button">
-      <span class="md-nav-bar__indicator"><span class="material-symbols-rounded">restaurant_menu</span></span>
-      Recetas
-    </button>
-    <button class="md-nav-rail__item nav-item" data-vista="productos" type="button">
-      <span class="md-nav-bar__indicator"><span class="material-symbols-rounded">sell</span></span>
-      Productos
+    <button class="md-nav-rail__item nav-item active" data-vista="proximos" type="button">
+      <span class="md-nav-bar__indicator"><span class="material-symbols-rounded">event_upcoming</span></span>
+      Próximos
     </button>
     <button class="md-nav-rail__item nav-item" data-vista="pedidos" type="button">
       <span class="md-nav-bar__indicator"><span class="material-symbols-rounded">receipt_long</span></span>
@@ -640,13 +815,9 @@
       <span class="md-nav-bar__indicator"><span class="material-symbols-rounded">warehouse</span></span>
       Stock
     </button>
-    <button class="md-nav-rail__item nav-item" data-vista="insumos" type="button">
-      <span class="md-nav-bar__indicator"><span class="material-symbols-rounded">inventory_2</span></span>
-      Insumos
-    </button>
-    <button class="md-nav-rail__item nav-item" data-vista="ajustes" type="button">
-      <span class="md-nav-bar__indicator"><span class="material-symbols-rounded">settings</span></span>
-      Ajustes
+    <button class="md-nav-rail__item nav-item" data-vista="mas" type="button">
+      <span class="md-nav-bar__indicator"><span class="material-symbols-rounded">more_horiz</span></span>
+      Más
     </button>
   </nav>
 
@@ -664,13 +835,9 @@
 
   <!-- Navigation bar (mobile <1024px) -->
   <nav class="md-nav-bar" aria-label="Navegación principal móvil">
-    <button class="md-nav-bar__item nav-item active" data-vista="recetas" type="button">
-      <span class="md-nav-bar__indicator"><span class="material-symbols-rounded">restaurant_menu</span></span>
-      Recetas
-    </button>
-    <button class="md-nav-bar__item nav-item" data-vista="productos" type="button">
-      <span class="md-nav-bar__indicator"><span class="material-symbols-rounded">sell</span></span>
-      Productos
+    <button class="md-nav-bar__item nav-item active" data-vista="proximos" type="button">
+      <span class="md-nav-bar__indicator"><span class="material-symbols-rounded">event_upcoming</span></span>
+      Próximos
     </button>
     <button class="md-nav-bar__item nav-item" data-vista="pedidos" type="button">
       <span class="md-nav-bar__indicator"><span class="material-symbols-rounded">receipt_long</span></span>
@@ -680,13 +847,9 @@
       <span class="md-nav-bar__indicator"><span class="material-symbols-rounded">warehouse</span></span>
       Stock
     </button>
-    <button class="md-nav-bar__item nav-item" data-vista="insumos" type="button">
-      <span class="md-nav-bar__indicator"><span class="material-symbols-rounded">inventory_2</span></span>
-      Insumos
-    </button>
-    <button class="md-nav-bar__item nav-item" data-vista="ajustes" type="button">
-      <span class="md-nav-bar__indicator"><span class="material-symbols-rounded">settings</span></span>
-      Ajustes
+    <button class="md-nav-bar__item nav-item" data-vista="mas" type="button">
+      <span class="md-nav-bar__indicator"><span class="material-symbols-rounded">more_horiz</span></span>
+      Más
     </button>
   </nav>
 </div>
@@ -770,23 +933,269 @@ function calcular(r){
 }
 
 /* ---------- Render principal ---------- */
-let vistaActual='recetas';
+let vistaActual='proximos';
 const vista=document.getElementById('vista');
 
 function setTab(v){
   vistaActual=v;
-  document.querySelectorAll('.nav-item').forEach(t=>t.classList.toggle('active', t.dataset.vista===v));
+  // Sólo las 4 tabs principales se marcan como activas; en submenús, "Más" queda activa.
+  const tabsPrincipales = ['proximos','pedidos','stock','mas'];
+  const tabResaltada = tabsPrincipales.includes(v) ? v : 'mas';
+  document.querySelectorAll('.nav-item').forEach(t=>t.classList.toggle('active', t.dataset.vista===tabResaltada));
   render();
+  window.scrollTo({top:0});
 }
 document.querySelectorAll('.nav-item').forEach(t=>t.addEventListener('click',()=>setTab(t.dataset.vista)));
 
 function render(){
-  if(vistaActual==='recetas') renderRecetas();
-  else if(vistaActual==='productos') renderProductos();
+  if(vistaActual==='proximos') renderProximos();
   else if(vistaActual==='pedidos') renderPedidos();
   else if(vistaActual==='stock') renderStock();
+  else if(vistaActual==='mas') renderMas();
+  else if(vistaActual==='recetas') renderRecetas();
+  else if(vistaActual==='productos') renderProductos();
   else if(vistaActual==='insumos') renderInsumos();
   else renderAjustes();
+}
+
+/* ---------- Helpers de fecha ---------- */
+function isoLocalHoy(){
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,'0');
+  const dd = String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${dd}`;
+}
+function diasEntreISO(iso1, iso2){
+  if(!iso1 || !iso2) return null;
+  const d1 = new Date(iso1+'T00:00:00');
+  const d2 = new Date(iso2+'T00:00:00');
+  return Math.round((d2-d1)/(1000*60*60*24));
+}
+function fmtFechaRelativa(iso){
+  if(!iso) return 'Sin fecha';
+  const diff = diasEntreISO(isoLocalHoy(), iso);
+  if(diff===0) return 'Hoy';
+  if(diff===1) return 'Mañana';
+  if(diff===-1) return 'Ayer';
+  if(diff>=2 && diff<=6){
+    const dias = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+    const d = new Date(iso+'T00:00:00');
+    const [, m, dd] = iso.split('-');
+    return `${dias[d.getDay()]} ${dd}/${m}`;
+  }
+  const [, m, dd] = iso.split('-');
+  return `${dd}/${m}`;
+}
+function urgenciaPedido(p){
+  if(!p.fechaEntrega || p.estado==='entregado') return 'normal';
+  const diff = diasEntreISO(isoLocalHoy(), p.fechaEntrega);
+  if(diff===null) return 'normal';
+  if(diff<0) return 'vencido';
+  if(diff<=1) return 'urgente';
+  return 'normal';
+}
+function totalPedidoCalc(p){
+  return (p.items||[]).reduce((s,it)=>s+num(it.cantidad)*num(it.precio),0);
+}
+
+/* ---------- Header de sección con botón Volver ---------- */
+function backHeader(titulo){
+  return `<div class="seccion-header">
+    <button class="back-mas" type="button" onclick="setTab('mas')">
+      <span class="material-symbols-rounded">arrow_back</span> Volver
+    </button>
+    <h2 class="seccion-title">${esc(titulo)}</h2>
+  </div>`;
+}
+function tituloSeccion(titulo){
+  return `<h2 class="seccion-title seccion-title--solo">${esc(titulo)}</h2>`;
+}
+
+/* ----- Vista Próximos (Hoy + Mañana) ----- */
+function fechaLargaDe(iso){
+  const d = new Date(iso+'T00:00:00');
+  const dias=['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+  const meses=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  return `${dias[d.getDay()]} ${d.getDate()} de ${meses[d.getMonth()]}`;
+}
+function isoMasDias(n){
+  const d = new Date();
+  d.setDate(d.getDate()+n);
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function resumenProduccionDe(listaPedidos){
+  const m = new Map();
+  listaPedidos.forEach(p=>{
+    if(p.estado==='entregado') return;
+    (p.items||[]).forEach(it=>{
+      const r = recetas.find(x=>x.id===it.recetaId); if(!r) return;
+      const por = unidadesPorVenta(r.unidadVenta||'unidad');
+      const cant = num(it.cantidad) * por;
+      const slot = m.get(it.recetaId) || {nombre:r.nombre, cant:0, stock:r.stock||0};
+      slot.cant += cant;
+      m.set(it.recetaId, slot);
+    });
+  });
+  return m;
+}
+function bloqueDia(titulo, fechaIso, pedidosDelDia, opts){
+  const aCobrar = pedidosDelDia.filter(p=>!p.pagado).reduce((s,p)=>s+totalPedidoCalc(p), 0);
+  const produccion = resumenProduccionDe(pedidosDelDia);
+
+  let html = `<h2 class="dia-title">${titulo} <span class="dia-title__sub">· ${fechaLargaDe(fechaIso)}</span></h2>`;
+
+  html += `<div class="md-card outlined section hoy-card">
+    <h3 class="hoy-section">📦 Entregás</h3>`;
+  if(pedidosDelDia.length===0){
+    html += `<p class="hoy-empty-msg">Nada para entregar.</p>`;
+  } else {
+    html += `<div class="pedidos-cards-wrap">${pedidosDelDia.map(renderPedidoCard).join('')}</div>`;
+  }
+  html += `</div>`;
+
+  if(opts && opts.mostrarHero && aCobrar>0){
+    html += `<div class="hero success" style="margin:14px 0">
+      <div class="hero__label">Cobrás ${titulo.toLowerCase()}</div>
+      <div class="hero__big">${$(aCobrar)}</div>
+      <div class="hero__msg">De los pedidos sin pagar</div>
+    </div>`;
+  }
+
+  if(produccion.size){
+    html += `<div class="md-card outlined section hoy-card">
+      <h3 class="hoy-section">🥧 Producir</h3>
+      <ul class="hoy-prod">${Array.from(produccion.values()).map(s=>{
+        const tras = s.stock>0 ? ` <small style="color:var(--md-sys-color-on-surface-variant); font-weight:600">(tenés ${s.stock} en stock)</small>` : '';
+        return `<li><b>${s.cant}</b> ${esc(s.nombre)}${tras}</li>`;
+      }).join('')}</ul>
+    </div>`;
+  }
+  return html;
+}
+function renderProximos(){
+  const hoy = isoLocalHoy();
+  const manana = isoMasDias(1);
+  const pedidosVencidos = pedidos.filter(p=>p.fechaEntrega && p.fechaEntrega<hoy && p.estado!=='entregado');
+  const pedidosHoy = pedidos.filter(p=>p.fechaEntrega===hoy && p.estado!=='entregado');
+  const pedidosManana = pedidos.filter(p=>p.fechaEntrega===manana && p.estado!=='entregado');
+
+  let html = '';
+
+  if(pedidosVencidos.length){
+    html += `<div class="md-card outlined section hoy-card vencidos-card">
+      <h3 class="hoy-section">⚠ Atrasados (${pedidosVencidos.length})</h3>
+      <div class="pedidos-cards-wrap">${pedidosVencidos.map(renderPedidoCard).join('')}</div>
+    </div>`;
+  }
+
+  html += bloqueDia('Hoy', hoy, pedidosHoy, {mostrarHero:true});
+  html += `<div class="dia-separator"></div>`;
+  html += bloqueDia('Mañana', manana, pedidosManana, {mostrarHero:false});
+
+  if(pedidos.length===0){
+    html += `<div class="md-card outlined section">
+      <div class="empty">
+        <span class="material-symbols-rounded">event_upcoming</span>
+        <p class="empty-title">¡Bienvenida!</p>
+        <small>Cuando cargues pedidos, los próximos aparecen acá.</small>
+      </div>
+    </div>`;
+  }
+
+  vista.innerHTML = html;
+}
+
+/* ----- Vista Más (configuración) ----- */
+function renderMas(){
+  const items = [
+    {v:'recetas',   icon:'restaurant_menu', titulo:'Recetas',   desc:'Cargar recetas y calcular costos'},
+    {v:'productos', icon:'sell',            titulo:'Productos', desc:'Costos y precios por unidad'},
+    {v:'insumos',   icon:'inventory_2',     titulo:'Insumos',   desc:'Materia prima y precios de compra'},
+    {v:'ajustes',   icon:'settings',        titulo:'Ajustes',   desc:'Gas del horno, pago por hora, sesión'}
+  ];
+  vista.innerHTML = `
+    <p class="mas-intro">Configuración y gestión del negocio.</p>
+    <div class="stack">${items.map(it=>`
+      <button class="item-card" type="button" onclick="setTab('${it.v}')">
+        <span class="material-symbols-rounded mas-icon">${it.icon}</span>
+        <div class="item-card__info">
+          <div class="item-card__name">${it.titulo}</div>
+          <div class="item-card__sub">${it.desc}</div>
+        </div>
+        <span class="material-symbols-rounded chev">chevron_right</span>
+      </button>`).join('')}</div>`;
+}
+
+/* ----- Card de pedido (compartida entre Hoy y Pedidos) ----- */
+function renderPedidoCard(p){
+  const em = estadoMeta(p.estado);
+  const items = p.items || [];
+  let resumenItems = '<small>Sin productos</small>';
+  if(items.length){
+    const r0 = recetas.find(x=>x.id===items[0].recetaId);
+    const n0 = r0 ? r0.nombre : '(borrado)';
+    const uv0 = r0 ? (r0.unidadVenta||'unidad') : 'unidad';
+    const c0 = num(items[0].cantidad);
+    resumenItems = `${c0} ${pluralUnidad(uv0,c0)} ${esc(n0)}${items.length>1?` <small>+${items.length-1} más</small>`:''}`;
+  }
+  const wa = waLink(p.celular);
+  const waBtn = wa ? `<a class="pedido-tbl__wa" href="${wa}" target="_blank" rel="noopener" onclick="event.stopPropagation()" aria-label="Abrir WhatsApp">
+    <svg viewBox="0 0 32 32" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M16 .4C7.4.4.4 7.4.4 16c0 2.8.7 5.4 2 7.7L.3 31.6l8.1-2.1c2.2 1.2 4.8 1.9 7.5 1.9 8.6 0 15.6-7 15.6-15.6S24.6.4 16 .4zm0 28.4c-2.5 0-4.8-.7-6.8-1.9l-.5-.3-4.8 1.3 1.3-4.7-.3-.5C3.6 20.7 2.9 18.4 2.9 16 2.9 8.8 8.8 2.9 16 2.9S29.1 8.8 29.1 16 23.2 28.8 16 28.8zm7.2-9.8c-.4-.2-2.3-1.1-2.7-1.3-.4-.1-.6-.2-.9.2-.3.4-1 1.3-1.3 1.5-.2.3-.5.3-.9.1-.4-.2-1.7-.6-3.2-2-1.2-1-2-2.3-2.2-2.7-.2-.4 0-.6.2-.8.2-.2.4-.5.6-.7.2-.2.3-.4.4-.7.1-.3 0-.5-.1-.7-.1-.2-.9-2.1-1.2-2.9-.3-.8-.6-.6-.9-.7-.2 0-.5 0-.7 0-.2 0-.7.1-1 .5-.3.4-1.3 1.3-1.3 3.1 0 1.8 1.3 3.6 1.5 3.8.2.3 2.6 4 6.4 5.6 2.3.9 3.1.9 4.2.8 1-.1 2.3-.9 2.6-1.9.3-1 .3-1.8.2-1.9-.1-.2-.4-.3-.7-.5z"/></svg>
+  </a>` : '';
+
+  const total = totalPedidoCalc(p);
+  const totalLbl = total>0 ? $(total) : '—';
+  const urgencia = urgenciaPedido(p);
+
+  return `<div class="pedido-list-card pedido-list-card--${urgencia}" onclick="abrirPedido('${p.id}')">
+    <div class="pedido-list-card__top">
+      <div class="pedido-list-card__cliente">${esc(p.cliente)||'Sin cliente'}</div>
+      <div class="pedido-list-card__total">${totalLbl}</div>
+    </div>
+    <div class="pedido-list-card__row">
+      <button class="pill-btn ${em.tono}" type="button" onclick="ciclarEstadoPedido('${p.id}', event)" title="Tocá para cambiar estado">${em.lbl}</button>
+      <button class="pill-btn ${p.pagado?'success':'neutral'}" type="button" onclick="ciclarPagoPedido('${p.id}', event)" title="Tocá para cambiar pago">${p.pagado?'Pagado':'Por cobrar'}</button>
+      <span class="pedido-list-card__fecha">
+        <span class="material-symbols-rounded">event</span>
+        ${fmtFechaRelativa(p.fechaEntrega)}
+      </span>
+      ${waBtn}
+    </div>
+    <div class="pedido-list-card__items">${resumenItems}</div>
+  </div>`;
+}
+
+/* ----- Toggle pagado del pedido ----- */
+async function ciclarPagoPedido(id, ev){
+  if(ev) ev.stopPropagation();
+  const p = pedidos.find(x=>x.id===id); if(!p) return;
+  p.pagado = !p.pagado;
+  await guardarTodo();
+  render();
+  toast(p.pagado ? 'Marcado como pagado' : 'Marcado como por cobrar');
+}
+
+/* ----- Ciclar estado del pedido (Pendiente → Listo → Entregado) ----- */
+async function ciclarEstadoPedido(id, ev){
+  if(ev) ev.stopPropagation();
+  const p = pedidos.find(x=>x.id===id); if(!p) return;
+  const orden = ['pendiente','listo','entregado'];
+  const idxAct = orden.indexOf(p.estado);
+  const eraEntregado = p.estado==='entregado' && p.stockDescontado;
+  const nuevo = orden[(idxAct+1) % orden.length];
+  p.estado = nuevo;
+  if(nuevo==='entregado' && !eraEntregado){
+    ajustarStockPedido(p, -1);
+    p.stockDescontado = true;
+  } else if(nuevo!=='entregado' && eraEntregado){
+    ajustarStockPedido(p, +1);
+    p.stockDescontado = false;
+  }
+  await guardarTodo();
+  render();
+  const meta = estadoMeta(nuevo);
+  toast(`Marcado como ${meta.lbl}`);
 }
 
 /* ----- Vista Recetas ----- */
@@ -800,7 +1209,7 @@ function chipTono(tono){
   return tono==='success'?'status success':tono==='error'?'status error':'status neutral';
 }
 function renderRecetas(){
-  let html = `<div class="add-bar"><button class="md-button filled" type="button" onclick="abrirReceta()">
+  let html = backHeader('Recetas') + `<div class="add-bar"><button class="md-button filled" type="button" onclick="abrirReceta()">
     <span class="material-symbols-rounded">add</span> Nueva receta
   </button></div>`;
   if(recetas.length===0){
@@ -837,9 +1246,9 @@ function unidadesPorVenta(uv){
   return 1; // unidad, porción, kilo
 }
 function renderProductos(){
-  let html = '';
+  let html = backHeader('Productos');
   if(recetas.length===0){
-    html = `<div class="md-card outlined section">
+    html += `<div class="md-card outlined section">
       <div class="empty">
         <span class="material-symbols-rounded">sell</span>
         <p class="empty-title">Sin productos para mostrar</p>
@@ -870,7 +1279,7 @@ function renderProductos(){
         <td class="num"><span class="md-chip ${chipTono(tono)}">${gananciaTxt} · ${margenTxt}</span></td>
       </tr>`;
     }).join('');
-    html = `<div class="prod-tbl-wrap">
+    html += `<div class="prod-tbl-wrap">
       <table class="prod-tbl">
         <thead>
           <tr>
@@ -938,20 +1347,20 @@ function resumenProduccion(){
     .filter(s=>s.aProducir>0 || s.porEntregar>0 || s.stock>0);
 }
 function renderPedidos(){
-  let html = `<div class="add-bar"><button class="md-button filled" type="button" onclick="abrirPedido()">
+  let html = tituloSeccion('Pedidos') + `<div class="add-bar"><button class="md-button filled" type="button" onclick="abrirPedido()">
     <span class="material-symbols-rounded">add</span> Nuevo pedido
   </button></div>`;
   const resumen = resumenProduccion();
   if(resumen.length){
     html += `<div class="md-card outlined section" style="padding:14px 16px">
       <h3 style="margin:0 0 4px 0; font-size:13px; text-transform:uppercase; letter-spacing:0.6px; color:var(--md-sys-color-on-surface-variant)">Resumen de producción</h3>
-      <p class="hint" style="margin:0 0 10px">Todo en unidades. "Falta hacer" = pedidos pendientes − stock disponible.</p>
+      <p class="hint" style="margin:0 0 10px">Todo en unidades. "Te falta" = lo que te pidieron menos lo que ya tenés.</p>
       <div class="prod-tbl-wrap" style="border:none; background:transparent; --th-sticky:60px">
         <table class="prod-tbl"><thead><tr>
           <th>Producto</th>
-          <th class="num">Falta hacer</th>
-          <th class="num">Stock</th>
-          <th class="num">A producir</th>
+          <th class="num">Te falta</th>
+          <th class="num">Tenés</th>
+          <th class="num">Te pidieron</th>
         </tr></thead><tbody>` +
         resumen.map(s=>{
           const stockLbl = s.stock>0 ? `${s.stock} u` : '—';
@@ -979,57 +1388,21 @@ function renderPedidos(){
       if(ord[a.estado]!==ord[b.estado]) return ord[a.estado]-ord[b.estado];
       return (a.fechaEntrega||'').localeCompare(b.fechaEntrega||'');
     });
-    const filas = ordenados.map(p=>{
-      const em = estadoMeta(p.estado);
-      const items = p.items || [];
-      let resumenItems = '<small>Sin productos</small>';
-      if(items.length){
-        const r0 = recetas.find(x=>x.id===items[0].recetaId);
-        const n0 = r0 ? r0.nombre : '(borrado)';
-        const uv0 = r0 ? (r0.unidadVenta||'unidad') : 'unidad';
-        const c0 = num(items[0].cantidad);
-        resumenItems = `${c0} ${pluralUnidad(uv0,c0)} ${esc(n0)}${items.length>1?` <small>+${items.length-1} más</small>`:''}`;
-      }
-      const wa = waLink(p.celular);
-      const waBtn = wa ? `<a class="pedido-tbl__wa" href="${wa}" target="_blank" rel="noopener" onclick="event.stopPropagation()" aria-label="Abrir WhatsApp">
-        <svg viewBox="0 0 32 32" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M16 .4C7.4.4.4 7.4.4 16c0 2.8.7 5.4 2 7.7L.3 31.6l8.1-2.1c2.2 1.2 4.8 1.9 7.5 1.9 8.6 0 15.6-7 15.6-15.6S24.6.4 16 .4zm0 28.4c-2.5 0-4.8-.7-6.8-1.9l-.5-.3-4.8 1.3 1.3-4.7-.3-.5C3.6 20.7 2.9 18.4 2.9 16 2.9 8.8 8.8 2.9 16 2.9S29.1 8.8 29.1 16 23.2 28.8 16 28.8zm7.2-9.8c-.4-.2-2.3-1.1-2.7-1.3-.4-.1-.6-.2-.9.2-.3.4-1 1.3-1.3 1.5-.2.3-.5.3-.9.1-.4-.2-1.7-.6-3.2-2-1.2-1-2-2.3-2.2-2.7-.2-.4 0-.6.2-.8.2-.2.4-.5.6-.7.2-.2.3-.4.4-.7.1-.3 0-.5-.1-.7-.1-.2-.9-2.1-1.2-2.9-.3-.8-.6-.6-.9-.7-.2 0-.5 0-.7 0-.2 0-.7.1-1 .5-.3.4-1.3 1.3-1.3 3.1 0 1.8 1.3 3.6 1.5 3.8.2.3 2.6 4 6.4 5.6 2.3.9 3.1.9 4.2.8 1-.1 2.3-.9 2.6-1.9.3-1 .3-1.8.2-1.9-.1-.2-.4-.3-.7-.5z"/></svg>
-      </a>` : '';
-      return `<tr onclick="abrirPedido('${p.id}')">
-        <td><div class="prod-tbl__name">${esc(p.cliente)||'Sin cliente'}</div></td>
-        <td>${fmtFecha(p.fechaEntrega)}</td>
-        <td><span class="md-chip status ${em.tono}">${em.lbl}</span></td>
-        <td>${p.pagado?'<span class="md-chip status success">Pagado</span>':'<span class="md-chip status neutral">Por cobrar</span>'}</td>
-        <td>${resumenItems}</td>
-        <td class="num">${waBtn}</td>
-      </tr>`;
-    }).join('');
+    const cards = ordenados.map(renderPedidoCard).join('');
     html += `<h3 class="section-title">Pedidos cargados</h3>
-    <div class="prod-tbl-wrap" style="--th-sticky:60px">
-      <table class="prod-tbl">
-        <thead><tr>
-          <th>Cliente</th>
-          <th>Entrega</th>
-          <th>Estado</th>
-          <th>Pago</th>
-          <th>Productos</th>
-          <th></th>
-        </tr></thead>
-        <tbody>${filas}</tbody>
-      </table>
-    </div>`;
+    <div class="pedidos-cards-wrap" style="display:flex">${cards}</div>`;
   }
   vista.innerHTML=html;
 }
 
 /* ---------- Modal Pedido ---------- */
-let edPCache = null, edPCacheOrig = null, edPDescontar = true;
+let edPCache = null, edPCacheOrig = null;
 function abrirPedido(id){
   const p = id ? pedidos.find(x=>x.id===id) : null;
   edPCache = p ? JSON.parse(JSON.stringify(p)) : {id:uid(), cliente:'', celular:'', fechaEntrega:'', estado:'pendiente', pagado:false, items:[], notas:'', stockDescontado:false};
   if(edPCache.celular===undefined) edPCache.celular='';
   if(typeof edPCache.stockDescontado!=='boolean') edPCache.stockDescontado = false;
   edPCacheOrig = p ? {estado:p.estado, stockDescontado:!!p.stockDescontado} : {estado:'pendiente', stockDescontado:false};
-  edPDescontar = true; // switch ON por default
   dibujarPedido(!id);
   overlay.classList.add('open');
 }
@@ -1078,17 +1451,6 @@ function dibujarPedido(esNuevo){
       <span class="switch-row__label">¿Está pagado?</span>
       <label class="md-switch">
         <input type="checkbox" id="p-pag" ${p.pagado?'checked':''} onchange="campoP('pagado',this.checked)">
-        <span class="md-switch__track"><span class="md-switch__thumb"></span></span>
-      </label>
-    </div>
-
-    <div class="switch-row">
-      <span class="switch-row__label">
-        Descontar del stock al entregar
-        <small style="display:block; font-size:11px; font-weight:400; color:var(--md-sys-color-on-surface-variant); margin-top:2px">Si está OFF, no toca el stock (útil para cargar pedidos viejos).</small>
-      </span>
-      <label class="md-switch">
-        <input type="checkbox" id="p-desc" ${edPDescontar?'checked':''} onchange="edPDescontar=this.checked">
         <span class="md-switch__track"><span class="md-switch__thumb"></span></span>
       </label>
     </div>
@@ -1179,21 +1541,18 @@ async function guardarPedido(){
   if(!p.cliente){ toast('Ponele el nombre del cliente 🙂'); return; }
   p.items = (p.items||[]).filter(it=>it.recetaId && num(it.cantidad)>0);
 
-  // Lógica de stock al guardar
+  // Lógica de stock al guardar: descuento automático al entregar, reintegro al revertir.
   const eraEntregado = edPCacheOrig.estado==='entregado' && edPCacheOrig.stockDescontado;
   const esEntregado  = p.estado==='entregado';
   let mensajeStock = '';
-  if(esEntregado && !eraEntregado && edPDescontar){
+  if(esEntregado && !eraEntregado){
     ajustarStockPedido(p, -1);
     p.stockDescontado = true;
     mensajeStock = ' · stock actualizado';
   } else if(!esEntregado && eraEntregado){
-    // revertí entregado → reintegro
     ajustarStockPedido(p, +1);
     p.stockDescontado = false;
     mensajeStock = ' · stock reintegrado';
-  } else if(esEntregado && !edPDescontar){
-    p.stockDescontado = false; // marca que no se descontó
   }
 
   const idx = pedidos.findIndex(x=>x.id===p.id);
@@ -1202,15 +1561,30 @@ async function guardarPedido(){
 }
 async function borrarPedido(id){
   if(!confirm('¿Borrar este pedido?')) return;
-  pedidos = pedidos.filter(x=>x.id!==id);
-  await guardarTodo(); cerrar(); render(); toast('Pedido borrado');
+  const idx = pedidos.findIndex(x=>x.id===id);
+  if(idx===-1) return;
+  const snap = JSON.parse(JSON.stringify(pedidos[idx]));
+  // Si estaba entregado y tenía stock descontado, reintegrar al borrar.
+  if(snap.estado==='entregado' && snap.stockDescontado){
+    ajustarStockPedido(snap, +1);
+  }
+  pedidos.splice(idx, 1);
+  await guardarTodo(); cerrar(); render();
+  toastUndo('Pedido borrado', async ()=>{
+    // Restaurar tal cual estaba, deshaciendo el reintegro de stock si correspondía.
+    if(snap.estado==='entregado' && snap.stockDescontado){
+      ajustarStockPedido(snap, -1);
+    }
+    pedidos.splice(Math.min(idx, pedidos.length), 0, snap);
+    await guardarTodo(); render(); toast('Pedido restaurado');
+  });
 }
 
 /* ----- Vista Stock ----- */
 function renderStock(){
-  let html = '';
+  let html = tituloSeccion('Stock');
   if(recetas.length===0){
-    html = `<div class="md-card outlined section">
+    html += `<div class="md-card outlined section">
       <div class="empty">
         <span class="material-symbols-rounded">warehouse</span>
         <p class="empty-title">Sin productos para tener stock</p>
@@ -1218,8 +1592,8 @@ function renderStock(){
       </div>
     </div>`;
   } else {
-    html = `<div class="md-card outlined section" style="padding:14px 16px; margin-bottom:14px">
-      <p class="hint" style="margin:0">Stock en unidades individuales (cada alfajor, cada muffin…). Al entregar un pedido con el switch ON, el stock se descuenta solo.</p>
+    html += `<div class="md-card outlined section" style="padding:14px 16px; margin-bottom:14px">
+      <p class="hint" style="margin:0">Stock en unidades individuales (cada alfajor, cada muffin…). El stock se descuenta automáticamente al marcar un pedido como entregado.</p>
     </div>`;
     html += `<div class="stack">` + recetas.map(r=>{
       const uv = r.unidadVenta||'unidad';
@@ -1258,7 +1632,7 @@ async function setStock(recetaId, valor){
 
 /* ----- Vista Insumos ----- */
 function renderInsumos(){
-  let html = `<div class="add-bar"><button class="md-button filled" type="button" onclick="abrirInsumo()">
+  let html = backHeader('Insumos') + `<div class="add-bar"><button class="md-button filled" type="button" onclick="abrirInsumo()">
     <span class="material-symbols-rounded">add</span> Nuevo insumo
   </button></div>`;
   if(insumos.length===0){
@@ -1294,7 +1668,7 @@ function renderInsumos(){
 
 /* ----- Vista Ajustes ----- */
 function renderAjustes(){
-  vista.innerHTML = `
+  vista.innerHTML = backHeader('Ajustes') + `
   <div class="md-card outlined section">
     <h2 class="section-title">Gas del horno 🔥</h2>
     <div class="note">Como el horno usa gas, usamos un truco: la <b>diferencia</b> entre la boleta de gas de ella y la de otra casa parecida que no hornea. Esa diferencia es, más o menos, lo que cuesta hornear.</div>
@@ -1687,7 +2061,28 @@ function cerrar(){ overlay.classList.remove('open'); }
 overlay.addEventListener('click',e=>{ if(e.target===overlay) cerrar(); });
 function esc(s){ return String(s||'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m])); }
 let toastT;
-function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),2400); }
+let undoFn = null;
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.classList.add('show');
+  undoFn = null;
+  clearTimeout(toastT);
+  toastT=setTimeout(()=>t.classList.remove('show'),2400);
+}
+function toastUndo(msg, fn){
+  const t = document.getElementById('toast');
+  t.innerHTML = `<span>${esc(msg)}</span><button class="toast-undo" type="button" onclick="hacerUndo()">Deshacer</button>`;
+  t.classList.add('show');
+  undoFn = fn;
+  clearTimeout(toastT);
+  toastT = setTimeout(()=>{ t.classList.remove('show'); undoFn = null; }, 5000);
+}
+function hacerUndo(){
+  if(undoFn){ const fn = undoFn; undoFn = null; fn(); }
+  document.getElementById('toast').classList.remove('show');
+  clearTimeout(toastT);
+}
 
 /* ---------- Insumos precargados (solo en el primer arranque) ---------- */
 const SEED_INSUMOS=[
@@ -1763,7 +2158,8 @@ Object.assign(window, {
   campoR, cambioUnidadVenta, simular, cerrar, guardarAjustes,
   abrirPedido, guardarPedido, borrarPedido,
   campoP, agregarItemPedido, quitarItemPedido, setItemReceta, setItemCantidad, setItemPrecio,
-  ajustarStock, setStock
+  ajustarStock, setStock,
+  setTab, ciclarEstadoPedido, ciclarPagoPedido, hacerUndo
 });
 
 /* Boot: ¿hay sesión guardada? Si sí, arranco la app. Si no, login. */
