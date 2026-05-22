@@ -132,6 +132,8 @@
     color: var(--md-sys-color-on-surface-variant);
     text-transform: uppercase; letter-spacing: 0.6px;
     background: var(--md-sys-color-surface-container);
+    position: sticky; top: var(--th-sticky, 0);
+    z-index: 2;
   }
   .prod-tbl tbody tr {
     cursor: pointer;
@@ -944,7 +946,7 @@ function renderPedidos(){
     html += `<div class="md-card outlined section" style="padding:14px 16px">
       <h3 style="margin:0 0 4px 0; font-size:13px; text-transform:uppercase; letter-spacing:0.6px; color:var(--md-sys-color-on-surface-variant)">Resumen de producción</h3>
       <p class="hint" style="margin:0 0 10px">Todo en unidades. "Falta hacer" = pedidos pendientes − stock disponible.</p>
-      <div class="prod-tbl-wrap" style="border:none; background:transparent">
+      <div class="prod-tbl-wrap" style="border:none; background:transparent; --th-sticky:60px">
         <table class="prod-tbl"><thead><tr>
           <th>Producto</th>
           <th class="num">Falta hacer</th>
@@ -1002,7 +1004,7 @@ function renderPedidos(){
       </tr>`;
     }).join('');
     html += `<h3 class="section-title">Pedidos cargados</h3>
-    <div class="prod-tbl-wrap">
+    <div class="prod-tbl-wrap" style="--th-sticky:60px">
       <table class="prod-tbl">
         <thead><tr>
           <th>Cliente</th>
