@@ -2058,7 +2058,17 @@ async function borrarReceta(id){ if(!confirm('¿Borrar esta receta?'))return; re
 
 /* ---------- Util ---------- */
 function cerrar(){ overlay.classList.remove('open'); }
-overlay.addEventListener('click',e=>{ if(e.target===overlay) cerrar(); });
+let _downEnOverlay=false;
+overlay.addEventListener('mousedown',e=>{ _downEnOverlay = (e.target===overlay); });
+overlay.addEventListener('click',e=>{ if(e.target===overlay && _downEnOverlay) cerrar(); });
+// Enter guarda el modal abierto (salvo en textarea/select, donde Enter tiene su uso propio)
+overlay.addEventListener('keydown',e=>{
+  if(e.key!=='Enter' || e.shiftKey) return;
+  const t=e.target.tagName;
+  if(t==='TEXTAREA' || t==='SELECT') return;
+  const btn=modal.querySelector('.md-button.filled');
+  if(btn){ e.preventDefault(); btn.click(); }
+});
 function esc(s){ return String(s||'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m])); }
 let toastT;
 let undoFn = null;
